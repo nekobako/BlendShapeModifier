@@ -4,13 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable, BlendShapeExpression(BlendShapeExpressionType.Merge, "Merge")]
     internal class BlendShapeMergeExpression : IBlendShapeExpression
     {
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public List<IBlendShapeExpression> Expressions = new() { new BlendShapeSampleExpression(), new BlendShapeSampleExpression() };
 
         public IBlendShapeExpression Clone()

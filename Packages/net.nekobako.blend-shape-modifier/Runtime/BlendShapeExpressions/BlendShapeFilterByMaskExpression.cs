@@ -2,19 +2,20 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable, BlendShapeExpression(BlendShapeExpressionType.FilterByMask, "Filter By Mask")]
     internal class BlendShapeFilterByMaskExpression : IBlendShapeExpression
     {
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public int Slot = 0;
 
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public Texture2D Mask = null;
 
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public IBlendShapeExpression Expression = new BlendShapeSampleExpression();
 
         public IBlendShapeExpression Clone()

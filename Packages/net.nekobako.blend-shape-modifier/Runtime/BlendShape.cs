@@ -4,19 +4,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable]
     internal class BlendShape : IEquatable<BlendShape>
     {
-        [SerializeField]
+        [SerializeField, NotKeyable, BlendShapeName]
         public string Name = string.Empty;
 
         [SerializeField]
         public float Weight = 0.0f;
 
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public List<BlendShapeFrame> Frames = new();
 
         public BlendShape Clone()
