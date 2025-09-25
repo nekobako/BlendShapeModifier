@@ -25,6 +25,11 @@
             "name": "com.vrchat.avatars",
             "expression": "",
             "define": "BSM_VRCSDK3_AVATARS"
+        },
+        {
+            "name": "net.nekobako.mask-texture-editor",
+            "expression": "[1,2)",
+            "define": "BSM_MASK_TEXTURE_EDITOR"
         }
     ],
     "noEngineReferences": false

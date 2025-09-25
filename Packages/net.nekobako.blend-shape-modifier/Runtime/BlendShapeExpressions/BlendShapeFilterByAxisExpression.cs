@@ -2,22 +2,23 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable, BlendShapeExpression(BlendShapeExpressionType.FilterByAxis, "Filter By Axis")]
     internal class BlendShapeFilterByAxisExpression : IBlendShapeExpression
     {
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public Vector3 Position = Vector3.zero;
 
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public Vector3 Direction = Vector3.left;
 
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public float FalloffRange = 0.0f;
 
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public IBlendShapeExpression Expression = new BlendShapeSampleExpression();
 
         public IBlendShapeExpression Clone()

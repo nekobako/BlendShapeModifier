@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 using VRC.SDKBase;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
@@ -9,10 +10,10 @@ namespace net.nekobako.BlendShapeModifier.Runtime
     [HelpURL("https://blend-shape-modifier.nekobako.net")]
     internal class BlendShapeModifier : MonoBehaviour, IEditorOnly
     {
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public SkinnedMeshRenderer Renderer = null;
 
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public List<BlendShape> Shapes = new();
     }
 }

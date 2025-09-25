@@ -35,12 +35,22 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             context.ComputeContext.Observe(mask, x => x.imageContentsHash);
 
+#if BSM_MASK_TEXTURE_EDITOR
+            var editing = MaskTextureEditor.Editor.Window.ObserveTextureFor(context.ComputeContext, expression.Mask, context.Modifier.Renderer, expression.Slot,
+                BlendShapeFilterByMaskExpressionDrawer.MaskTextureEditorToken);
+            if (editing)
+            {
+                mask = editing;
+            }
+#endif
+
+            var temp = default(Texture2D);
             if (!mask.isReadable)
             {
                 var rt = RenderTexture.GetTemporary(mask.width, mask.height);
                 Graphics.Blit(mask, rt);
 
-                mask = new(mask.width, mask.height)
+                mask = temp = new(mask.width, mask.height)
                 {
                     filterMode = mask.filterMode,
                     wrapModeU = mask.wrapModeU,
@@ -63,9 +73,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 result.Tangent *= weight;
             }
 
-            if (mask != expression.Mask)
+            if (temp)
             {
-                Object.DestroyImmediate(mask);
+                Object.DestroyImmediate(temp);
             }
         }
     }

@@ -2,16 +2,17 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable]
     internal class BlendShapeFrame : IEquatable<BlendShapeFrame>
     {
-        [SerializeField]
+        [SerializeField, NotKeyable]
         public float Weight = 0.0f;
 
-        [SerializeReference]
+        [SerializeReference, NotKeyable]
         public IBlendShapeExpression Expression = new BlendShapeSampleExpression();
 
         public BlendShapeFrame Clone()
