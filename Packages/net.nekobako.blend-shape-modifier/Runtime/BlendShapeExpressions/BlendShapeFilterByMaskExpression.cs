@@ -16,6 +16,38 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
         [SerializeReference]
         public IBlendShapeExpression Expression = new BlendShapeSampleExpression();
+
+        public IBlendShapeExpression Clone()
+        {
+            return new BlendShapeFilterByMaskExpression
+            {
+                Slot = Slot,
+                Mask = Mask,
+                Expression = Expression.Clone(),
+            };
+        }
+
+        public bool Equals(IBlendShapeExpression other)
+        {
+            return other is BlendShapeFilterByMaskExpression expression
+                && Slot.Equals(expression.Slot)
+                && Mask.Equals(expression.Mask)
+                && Expression.Equals(expression.Expression);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as IBlendShapeExpression);
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = 0;
+            hash = HashCode.Combine(hash, Slot);
+            hash = HashCode.Combine(hash, Mask);
+            hash = HashCode.Combine(hash, Expression);
+            return hash;
+        }
     }
 }
 

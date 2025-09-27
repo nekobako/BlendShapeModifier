@@ -20,7 +20,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             foreach (var modifier in context.AvatarRootObject.GetComponentsInChildren<BlendShapeModifier>(true))
             {
-                BlendShapeModifierProcessor.Process(modifier);
+                if (!modifier.Renderer || !modifier.Renderer.sharedMesh)
+                {
+                    return;
+                }
+
+                modifier.Renderer.sharedMesh = BlendShapeModifierProcessor.GenerateMesh(modifier);
+
+                BlendShapeModifierProcessor.ApplyWeights(modifier, modifier.Renderer);
 
                 var asc = context.Extension<AnimatorServicesContext>();
                 var map = new Dictionary<EditorCurveBinding, EditorCurveBinding>();

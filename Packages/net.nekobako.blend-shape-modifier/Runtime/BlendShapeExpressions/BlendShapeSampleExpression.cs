@@ -13,6 +13,35 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
         [SerializeField]
         public float Weight = 100.0f;
+
+        public IBlendShapeExpression Clone()
+        {
+            return new BlendShapeSampleExpression
+            {
+                Name = Name,
+                Weight = Weight,
+            };
+        }
+
+        public bool Equals(IBlendShapeExpression other)
+        {
+            return other is BlendShapeSampleExpression expression
+                && Name.Equals(expression.Name)
+                && Weight.Equals(expression.Weight);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as IBlendShapeExpression);
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = 0;
+            hash = HashCode.Combine(hash, Name);
+            hash = HashCode.Combine(hash, Weight);
+            return hash;
+        }
     }
 }
 

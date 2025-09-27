@@ -14,6 +14,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "System.Collections.Immutable.dll",
         "VRCSDKBase.dll",
         "VRCSDK3A.dll"
     ],

@@ -18,7 +18,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
             InPhase(BuildPhase.Transforming)
                 .BeforePlugin("nadena.dev.modular-avatar")
                 .WithRequiredExtension(typeof(AnimatorServicesContext), x => x
-                    .Run(BlendShapeModifierPass.Instance));
+                    .Run(BlendShapeModifierPass.Instance)
+                    .PreviewingWith(new BlendShapeModifierPreview()));
         }
     }
 }

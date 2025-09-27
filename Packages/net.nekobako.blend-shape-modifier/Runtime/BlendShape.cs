@@ -2,12 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [Serializable]
-    internal class BlendShape
+    internal class BlendShape : IEquatable<BlendShape>
     {
         [SerializeField]
         public string Name = string.Empty;
@@ -17,6 +18,48 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
         [SerializeReference]
         public List<BlendShapeFrame> Frames = new();
+
+        public BlendShape Clone()
+        {
+            return new()
+            {
+                Name = Name,
+                Weight = Weight,
+                Frames = Frames.ConvertAll(x => x.Clone()),
+            };
+        }
+
+        public BlendShape Clone(float weight)
+        {
+            return new()
+            {
+                Name = Name,
+                Weight = weight,
+                Frames = Frames.ConvertAll(x => x.Clone()),
+            };
+        }
+
+        public bool Equals(BlendShape other)
+        {
+            return other is not null
+                && Name.Equals(other.Name)
+                && Weight.Equals(other.Weight)
+                && Frames.SequenceEqual(other.Frames);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as BlendShape);
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = 0;
+            hash = HashCode.Combine(hash, Name);
+            hash = HashCode.Combine(hash, Weight);
+            hash = Frames.Aggregate(hash, HashCode.Combine);
+            return hash;
+        }
     }
 }
 

@@ -3,6 +3,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using nadena.dev.ndmf.preview;
 using Object = UnityEngine.Object;
 
 namespace net.nekobako.BlendShapeModifier.Editor
@@ -27,6 +28,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             var mesh = new Mesh();
             context.Modifier.Renderer.BakeMesh(mesh, true);
+
+            context.ComputeContext.ObserveTransformPosition(context.Modifier.Renderer.transform);
 
             var vertices = mesh.vertices;
             for (var i = 0; i < results.Length; i++)
