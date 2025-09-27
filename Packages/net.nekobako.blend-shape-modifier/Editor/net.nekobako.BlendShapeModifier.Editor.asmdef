@@ -1,7 +1,12 @@
 {
     "name": "net.nekobako.BlendShapeModifier.Editor",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "net.nekobako.BlendShapeModifier.Runtime",
+        "nadena.dev.ndmf",
+        "Unity.Collections",
+        "net.nekobako.MaskTextureEditor.Editor"
+    ],
     "includePlatforms": [
         "Editor"
     ],
@@ -14,6 +19,12 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.avatars",
+            "expression": "",
+            "define": "BSM_VRCSDK3_AVATARS"
+        }
+    ],
     "noEngineReferences": false
 }
