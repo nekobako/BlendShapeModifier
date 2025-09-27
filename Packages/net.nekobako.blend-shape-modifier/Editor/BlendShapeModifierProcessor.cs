@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using UnityEngine;
+using nadena.dev.ndmf.preview;
 using Object = UnityEngine.Object;
 
 namespace net.nekobako.BlendShapeModifier.Editor
@@ -16,6 +17,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         public readonly ref struct Context
         {
             public BlendShapeModifier Modifier { get; init; }
+            public ComputeContext ComputeContext { get; init; }
             public ReadOnlySpan<BlendShape> BlendShapes { get; init; }
             public ReadOnlySpan<BlendShapeFrame> BlendShapeFrames { get; init; }
             public ReadOnlySpan<BlendShapeDelta> BlendShapeDeltas { get; init; }
@@ -42,13 +44,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public Vector3 Tangent;
         }
 
-        public static void Process(BlendShapeModifier modifier)
+        public static Mesh GenerateMesh(BlendShapeModifier modifier, ComputeContext context = null)
         {
-            if (!modifier.Renderer || !modifier.Renderer.sharedMesh)
-            {
-                return;
-            }
-
             var mesh = Object.Instantiate(modifier.Renderer.sharedMesh);
 
             using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + modifier.Shapes.Count, Allocator.Temp);
@@ -111,6 +108,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                             new()
                             {
                                 Modifier = modifier,
+                                ComputeContext = context ?? ComputeContext.NullContext,
                                 BlendShapes = blendShapesSpan[..i],
                                 BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
                                 BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
@@ -161,14 +159,17 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
             }
 
-            modifier.Renderer.sharedMesh = mesh;
+            return mesh;
+        }
 
+        public static void ApplyWeights(BlendShapeModifier modifier, SkinnedMeshRenderer renderer)
+        {
             foreach (var shape in modifier.Shapes)
             {
-                var index = mesh.GetBlendShapeIndex(shape.Name);
-                if (index >= 0 && index < mesh.blendShapeCount)
+                var index = renderer.sharedMesh.GetBlendShapeIndex(shape.Name);
+                if (index >= 0 && index < renderer.sharedMesh.blendShapeCount)
                 {
-                    modifier.Renderer.SetBlendShapeWeight(index, shape.Weight);
+                    renderer.SetBlendShapeWeight(index, shape.Weight);
                 }
             }
         }

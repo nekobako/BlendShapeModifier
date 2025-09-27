@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using nadena.dev.ndmf.preview;
 using Object = UnityEngine.Object;
 
 namespace net.nekobako.BlendShapeModifier.Editor
@@ -31,6 +32,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
             {
                 return;
             }
+
+            context.ComputeContext.Observe(mask, x => x.imageContentsHash);
 
             if (!mask.isReadable)
             {

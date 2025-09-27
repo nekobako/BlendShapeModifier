@@ -26,8 +26,9 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         }
     }
 
-    internal interface IBlendShapeExpression
+    internal interface IBlendShapeExpression : IEquatable<IBlendShapeExpression>
     {
+        IBlendShapeExpression Clone();
     }
 }
 
