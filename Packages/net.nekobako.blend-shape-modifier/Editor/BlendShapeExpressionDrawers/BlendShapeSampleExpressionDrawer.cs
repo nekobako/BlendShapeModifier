@@ -26,11 +26,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override void OnDrawInspectorGUI(Rect rect)
         {
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_NameProperty, true), true);
-            EditorGUI.PropertyField(rect, m_NameProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_NameProperty, GUIUtils.TrText("sample-expression-name"), true), true);
+            EditorGUI.PropertyField(rect, m_NameProperty, GUIUtils.TrText("sample-expression-name"), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_WeightProperty, true));
-            var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.Text(m_WeightProperty.displayName), m_WeightProperty);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_WeightProperty, GUIUtils.TrText("sample-expression-weight"), true));
+            var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.TrText("sample-expression-weight"), m_WeightProperty);
 
             var propertyRect = EditorGUI.PrefixLabel(rect, propertyContent);
             EditorGUI.DelayedFloatField(propertyRect, m_WeightProperty, GUIContent.none);
@@ -40,9 +40,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override float OnCalcInspectorHeight()
         {
-            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_NameProperty, true), true);
+            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_NameProperty, GUIUtils.TrText("sample-expression-name"), true), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_WeightProperty, true));
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_WeightProperty, GUIUtils.TrText("sample-expression-weight"), true));
 
             return rect.yMax;
         }

@@ -3,6 +3,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -22,7 +23,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             if (EditorGUI.DropdownButton(Rect.MinMaxRect(rect.xMax - s_DropDownStyle.Value.fixedWidth, rect.yMin, rect.xMax, rect.yMax), GUIContent.none, FocusType.Keyboard, s_DropDownStyle.Value))
             {
-                var dropdown = new GUIUtils.GenericDropdown("Shape");
+                var dropdown = new GUIUtils.GenericDropdown(CL4EE.Tr("shape"));
 
                 if (property.serializedObject.targetObject is BlendShapeModifier modifier
                     && modifier.Renderer

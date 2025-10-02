@@ -4,6 +4,7 @@ using System;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -78,8 +79,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         public void DrawInspectorGUI(Rect rect)
         {
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_NameProperty, true), true);
-            EditorGUI.PropertyField(rect, m_NameProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_NameProperty, GUIUtils.TrText("shape-name"), true), true);
+            EditorGUI.PropertyField(rect, m_NameProperty, GUIUtils.TrText("shape-name"), true);
 
             rect = GUIUtils.Line(rect, k_FramesHeight);
             DrawFrames(rect);
@@ -102,7 +103,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         public float CalcInspectorHeight()
         {
-            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_NameProperty, true), true);
+            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_NameProperty, GUIUtils.TrText("shape-name"), true), true);
 
             rect = GUIUtils.Line(rect, k_FramesHeight);
 
@@ -366,10 +367,10 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             newMinWeight = GUIUtils.DragFloatLabel(
                 new(rect.xMin + k_MinMaxWeightFieldWidth + k_MinMaxWeightLabelWidth * 0.0f, rect.y, k_MinMaxWeightLabelWidth, rect.height),
-                "Min", newMinWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
+                CL4EE.Tr("min-frame-weight"), newMinWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
             newMaxWeight = GUIUtils.DragFloatLabel(
                 new(rect.xMax - k_MinMaxWeightFieldWidth - k_MinMaxWeightLabelWidth * 1.0f, rect.y, k_MinMaxWeightLabelWidth, rect.height),
-                "Max", newMaxWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
+                CL4EE.Tr("max-frame-weight"), newMaxWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
 
             GUIUtils.FloatFieldFormatString = floatFieldFormatString;
 
@@ -403,7 +404,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         private void DrawHeader(Rect rect)
         {
             rect = s_HeaderPadding.Value.Remove(rect);
-            EditorGUI.LabelField(rect, "Frame", m_FramesProperty.arraySize > 0 ? "Weight" : string.Empty);
+            EditorGUI.LabelField(rect, CL4EE.Tr("frame"), m_FramesProperty.arraySize > 0 ? CL4EE.Tr("frame-weight") : string.Empty);
 
             rect = new(rect.xMax - k_MenuButtonWidth, rect.center.y - k_MenuButtonHeight * 0.5f, k_MenuButtonWidth, k_MenuButtonHeight);
             if (m_FramesProperty.arraySize > 0 && EditorGUI.DropdownButton(rect, GUIContent.none, FocusType.Passive, s_MenuButtonStyle.Value))
@@ -422,14 +423,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     var maxWeight = Mathf.Max(0.0f, maxFrameWeightProperty.floatValue);
                     var maxIndex = maxFrameWeightProperty.floatValue <= 0.0f ? m_FramesProperty.arraySize : m_FramesProperty.arraySize - 1;
 
-                    menu.AddItem(new("Distribute Frames"), false, () => DistributeFrames(minWeight, maxWeight, minIndex, maxIndex));
+                    menu.AddItem(new(CL4EE.Tr("distribute-frames")), false, () => DistributeFrames(minWeight, maxWeight, minIndex, maxIndex));
                 }
                 else
                 {
-                    menu.AddDisabledItem(new("Distribute Frames"));
+                    menu.AddDisabledItem(new(CL4EE.Tr("distribute-frames")));
                 }
 
-                menu.AddItem(new("Normalize Frames"), false, () => DistributeFrames(0.0f, 100.0f, -1, m_FramesProperty.arraySize - 1));
+                menu.AddItem(new(CL4EE.Tr("normalize-frames")), false, () => DistributeFrames(0.0f, 100.0f, -1, m_FramesProperty.arraySize - 1));
 
                 menu.DropDown(rect);
 

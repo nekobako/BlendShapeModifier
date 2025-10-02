@@ -1,0 +1,99 @@
+msgid ""
+msgstr ""
+"Language: en-us\n"
+
+msgid "locale:en-us"
+msgstr "English"
+
+msgid "preview"
+msgstr "Preview"
+
+msgid "disable-preview"
+msgstr "Disable"
+
+msgid "enable-preview"
+msgstr "Enable"
+
+msgid "renderer"
+msgstr "Renderer"
+
+msgid "shape"
+msgstr "Shape"
+
+msgid "shape-name"
+msgstr "Name"
+
+msgid "shape-weight"
+msgstr "Weight"
+
+msgid "new-shape-name"
+msgstr "New Shape"
+
+msgid "frame"
+msgstr "Frame"
+
+msgid "frame-weight"
+msgstr "Weight"
+
+msgid "min-frame-weight"
+msgstr "Min"
+
+msgid "max-frame-weight"
+msgstr "Max"
+
+msgid "distribute-frames"
+msgstr "Distribute Frames"
+
+msgid "normalize-frames"
+msgstr "Normalize Frames"
+
+msgid "expression"
+msgstr "Expression"
+
+msgid "sample-expression-name"
+msgstr "Name"
+
+msgid "sample-expression-weight"
+msgstr "Weight"
+
+msgid "filter-by-axis-expression-position"
+msgstr "Position"
+
+msgid "filter-by-axis-expression-direction"
+msgstr "Direction"
+
+msgid "filter-by-axis-expression-falloff-range"
+msgstr "Falloff Range"
+
+msgid "filter-by-axis-expression-edit"
+msgstr "Edit"
+
+msgid "filter-by-axis-expression-flip"
+msgstr "Flip"
+
+msgid "filter-by-mask-expression-slot"
+msgstr "Material Slot"
+
+msgid "filter-by-mask-expression-mask"
+msgstr "Mask Texture"
+
+msgid "filter-by-mask-expression-create"
+msgstr "Create"
+
+msgid "filter-by-mask-expression-edit"
+msgstr "Edit"
+
+msgid "mask-texture-editor-dialog-title"
+msgstr "Info"
+
+msgid "mask-texture-editor-dialog-message"
+msgstr "Mask Texture Editor is not installed."
+
+msgid "mask-texture-editor-dialog-open-vcc"
+msgstr "Open VCC/ALCOM"
+
+msgid "mask-texture-editor-dialog-open-web"
+msgstr "Open GitHub"
+
+msgid "mask-texture-editor-dialog-cancel"
+msgstr "Cancel"

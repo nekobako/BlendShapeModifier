@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -13,7 +14,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
     [CustomEditor(typeof(BlendShapeModifier))]
     internal class BlendShapeModifierEditor : UnityEditor.Editor
     {
-        private const string k_NewShapeName = "New Shape";
         private static readonly Lazy<RectOffset> s_HeaderPadding = new(() => new(15, 1, 0, 0));
 
         private SerializedProperty m_RendererProperty = null;
@@ -40,14 +40,18 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             serializedObject.Update();
 
+            CL4EE.DrawLanguagePicker();
+
+            GUIUtils.Space();
+
             EditorGUILayout.BeginHorizontal();
 
-            EditorGUILayout.PrefixLabel("Preview");
-            BlendShapeModifierPreview.PreviewNode.IsEnabled.Value = GUILayout.Toolbar(BlendShapeModifierPreview.PreviewNode.IsEnabled.Value ? 1 : 0, new[] { "Disable", "Enable" }) == 1;
+            EditorGUILayout.PrefixLabel(GUIUtils.TrText("preview"));
+            BlendShapeModifierPreview.PreviewNode.IsEnabled.Value = GUILayout.Toolbar(BlendShapeModifierPreview.PreviewNode.IsEnabled.Value ? 1 : 0, new[] { CL4EE.Tr("disable-preview"), CL4EE.Tr("enable-preview") }) == 1;
 
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.PropertyField(m_RendererProperty, true);
+            EditorGUILayout.PropertyField(m_RendererProperty, GUIUtils.TrText("renderer"), true);
 
             GUIUtils.Space();
             m_ReorderableList.DoLayoutList();
@@ -84,7 +88,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         private void DrawHeader(Rect rect)
         {
             rect = s_HeaderPadding.Value.Remove(rect);
-            EditorGUI.LabelField(rect, "Shape", m_ShapesProperty.arraySize > 0 ? "Weight" : string.Empty);
+            EditorGUI.LabelField(rect, CL4EE.Tr("shape"), m_ShapesProperty.arraySize > 0 ? CL4EE.Tr("shape-weight") : string.Empty);
         }
 
         private void DrawElement(Rect rect, int index, bool active, bool focused)
@@ -119,7 +123,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         private void OnAddDropdown(Rect rect, ReorderableList list)
         {
-            var dropdown = new GUIUtils.GenericDropdown("Shape");
+            var dropdown = new GUIUtils.GenericDropdown(CL4EE.Tr("shape"));
 
             if (target is BlendShapeModifier modifier
                 && modifier.Renderer
@@ -133,7 +137,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
             }
 
-            dropdown.AddItem(k_NewShapeName, () => AddShape(null, k_NewShapeName));
+            dropdown.AddItem(CL4EE.Tr("new-shape-name"), () => AddShape(null, CL4EE.Tr("new-shape-name")));
 
             dropdown.Show(rect);
 
