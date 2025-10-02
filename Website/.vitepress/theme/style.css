@@ -1,0 +1,48 @@
+.VPHero > .container > .main > .heading > .name,
+.VPHero > .container > .main > .heading > .text
+{
+  max-width: none;
+}
+
+.VPHero.has-image > .container > .image > .image-container > video
+{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (min-width: 640px)
+{
+  .VPHero > .container > .main > .heading > .name,
+  .VPHero > .container > .main > .heading > .text
+  {
+    max-width: none;
+  }
+}
+
+@media (min-width: 960px)
+{
+  .VPHero.has-image > .container > .main
+  {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 1440px)
+{
+  .VPNavBar.has-sidebar > .wrapper > .container > .title
+  {
+    padding-left: max(32px, calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2));
+    width: calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
+  }
+}
+
+@media (min-width: 1440px)
+{
+  .VPNavBar.has-sidebar > .wrapper > .container > .title
+  {
+    padding-left: max(32px, calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2));
+    width: calc((100vw - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
+  }
+}
