@@ -2,11 +2,11 @@
     "name": "net.nekobako.BlendShapeModifier.Editor",
     "rootNamespace": "",
     "references": [
-        "net.nekobako.BlendShapeModifier.Runtime",
-        "net.nekobako.BlendShapeModifier.Localization",
-        "nadena.dev.ndmf",
         "Unity.Collections",
-        "net.nekobako.MaskTextureEditor.Editor"
+        "nadena.dev.ndmf",
+        "net.nekobako.MaskTextureEditor.Editor",
+        "net.nekobako.BlendShapeModifier.Runtime",
+        "net.nekobako.BlendShapeModifier.Localization"
     ],
     "includePlatforms": [
         "Editor"
