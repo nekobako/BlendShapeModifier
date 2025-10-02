@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,5 +61,3 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         }
     }
 }
-
-#endif

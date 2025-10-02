@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -105,5 +103,3 @@ namespace net.nekobako.BlendShapeModifier.Editor
         }
     }
 }
-
-#endif

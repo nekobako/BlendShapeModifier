@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -51,5 +49,3 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         }
     }
 }
-
-#endif

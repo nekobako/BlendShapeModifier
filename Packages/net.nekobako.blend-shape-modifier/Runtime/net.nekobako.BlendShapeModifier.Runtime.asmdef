@@ -1,23 +1,18 @@
 {
     "name": "net.nekobako.BlendShapeModifier.Runtime",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "nadena.dev.ndmf.runtime"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "VRCSDKBase.dll",
-        "VRCSDK3A.dll"
+        "VRCSDKBase.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.vrchat.avatars",
-            "expression": "",
-            "define": "BSM_VRCSDK3_AVATARS"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

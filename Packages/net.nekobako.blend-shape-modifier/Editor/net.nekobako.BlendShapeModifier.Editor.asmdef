@@ -15,18 +15,11 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "System.Collections.Immutable.dll",
-        "VRCSDKBase.dll",
-        "VRCSDK3A.dll"
+        "System.Collections.Immutable.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [
-        {
-            "name": "com.vrchat.avatars",
-            "expression": "",
-            "define": "BSM_VRCSDK3_AVATARS"
-        },
         {
             "name": "net.nekobako.mask-texture-editor",
             "expression": "[1,2)",
