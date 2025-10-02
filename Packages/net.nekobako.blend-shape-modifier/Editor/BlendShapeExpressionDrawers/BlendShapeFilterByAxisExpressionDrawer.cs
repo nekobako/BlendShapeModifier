@@ -69,14 +69,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override void OnDrawInspectorGUI(Rect rect)
         {
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_PositionProperty, true), true);
-            EditorGUI.PropertyField(rect, m_PositionProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_PositionProperty, GUIUtils.TrText("filter-by-axis-expression-position"), true), true);
+            EditorGUI.PropertyField(rect, m_PositionProperty, GUIUtils.TrText("filter-by-axis-expression-position"), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_DirectionProperty, true));
-            EditorGUI.PropertyField(rect, m_DirectionProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_DirectionProperty, GUIUtils.TrText("filter-by-axis-expression-direction"), true));
+            EditorGUI.PropertyField(rect, m_DirectionProperty, GUIUtils.TrText("filter-by-axis-expression-direction"), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_FalloffRangeProperty, true));
-            EditorGUI.PropertyField(rect, m_FalloffRangeProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_FalloffRangeProperty, GUIUtils.TrText("filter-by-axis-expression-falloff-range"), true));
+            EditorGUI.PropertyField(rect, m_FalloffRangeProperty, GUIUtils.TrText("filter-by-axis-expression-falloff-range"), true);
 
             rect = GUIUtils.Line(rect);
             DrawButtons(rect);
@@ -89,11 +89,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override float OnCalcInspectorHeight()
         {
-            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_PositionProperty, true), true);
+            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_PositionProperty, GUIUtils.TrText("filter-by-axis-expression-position"), true), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_DirectionProperty, true));
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_DirectionProperty, GUIUtils.TrText("filter-by-axis-expression-direction"), true));
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_FalloffRangeProperty, true));
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_FalloffRangeProperty, GUIUtils.TrText("filter-by-axis-expression-falloff-range"), true));
 
             rect = GUIUtils.Line(rect);
 
@@ -175,14 +175,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             EditorGUI.BeginChangeCheck();
 
-            var edit = GUI.Toggle(Rect.MinMaxRect(rect.xMin, rect.yMin, rect.center.x - k_ButtonSpacing * 0.5f, rect.yMax), IsEditing(this), "Edit", GUI.skin.button);
+            var edit = GUI.Toggle(Rect.MinMaxRect(rect.xMin, rect.yMin, rect.center.x - k_ButtonSpacing * 0.5f, rect.yMax), IsEditing(this), GUIUtils.TrText("filter-by-axis-expression-edit"), GUI.skin.button);
 
             if (EditorGUI.EndChangeCheck())
             {
                 SetEditing(edit ? this : null);
             }
 
-            if (GUI.Button(Rect.MinMaxRect(rect.center.x + k_ButtonSpacing * 0.5f, rect.yMin, rect.xMax, rect.yMax), "Flip"))
+            if (GUI.Button(Rect.MinMaxRect(rect.center.x + k_ButtonSpacing * 0.5f, rect.yMin, rect.xMax, rect.yMax), GUIUtils.TrText("filter-by-axis-expression-flip")))
             {
                 m_DirectionProperty.vector3Value *= -1.0f;
             }

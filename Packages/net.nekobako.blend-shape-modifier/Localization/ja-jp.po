@@ -1,0 +1,99 @@
+msgid ""
+msgstr ""
+"Language: ja-jp\n"
+
+msgid "locale:ja-jp"
+msgstr "日本語"
+
+msgid "preview"
+msgstr "プレビュー"
+
+msgid "disable-preview"
+msgstr "無効"
+
+msgid "enable-preview"
+msgstr "有効"
+
+msgid "renderer"
+msgstr "レンダラー"
+
+msgid "shape"
+msgstr "シェイプ"
+
+msgid "shape-name"
+msgstr "名前"
+
+msgid "shape-weight"
+msgstr "ウェイト"
+
+msgid "new-shape-name"
+msgstr "新規シェイプ"
+
+msgid "frame"
+msgstr "フレーム"
+
+msgid "frame-weight"
+msgstr "ウェイト"
+
+msgid "min-frame-weight"
+msgstr "最小"
+
+msgid "max-frame-weight"
+msgstr "最大"
+
+msgid "distribute-frames"
+msgstr "フレームを分配"
+
+msgid "normalize-frames"
+msgstr "フレームを正規化"
+
+msgid "expression"
+msgstr "エクスプレッション"
+
+msgid "sample-expression-name"
+msgstr "名前"
+
+msgid "sample-expression-weight"
+msgstr "ウェイト"
+
+msgid "filter-by-axis-expression-position"
+msgstr "位置"
+
+msgid "filter-by-axis-expression-direction"
+msgstr "方向"
+
+msgid "filter-by-axis-expression-falloff-range"
+msgstr "減衰範囲"
+
+msgid "filter-by-axis-expression-edit"
+msgstr "編集"
+
+msgid "filter-by-axis-expression-flip"
+msgstr "反転"
+
+msgid "filter-by-mask-expression-slot"
+msgstr "マテリアルスロット"
+
+msgid "filter-by-mask-expression-mask"
+msgstr "マスクテクスチャー"
+
+msgid "filter-by-mask-expression-create"
+msgstr "作成"
+
+msgid "filter-by-mask-expression-edit"
+msgstr "編集"
+
+msgid "mask-texture-editor-dialog-title"
+msgstr "情報"
+
+msgid "mask-texture-editor-dialog-message"
+msgstr "マスクテクスチャエディターがインストールされていません。"
+
+msgid "mask-texture-editor-dialog-open-vcc"
+msgstr "VCC/ALCOM を開く"
+
+msgid "mask-texture-editor-dialog-open-web"
+msgstr "GitHub を開く"
+
+msgid "mask-texture-editor-dialog-cancel"
+msgstr "キャンセル"

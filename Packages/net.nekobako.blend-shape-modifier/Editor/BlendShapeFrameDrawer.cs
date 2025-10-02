@@ -3,6 +3,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -36,7 +37,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             rect = GUIUtils.Line(rect, true);
             GUI.Box(rect, GUIContent.none, s_HeaderStyle.Value);
-            EditorGUI.LabelField(s_HeaderPadding.Value.Remove(rect), "Expression");
+            EditorGUI.LabelField(s_HeaderPadding.Value.Remove(rect), CL4EE.Tr("expression"));
 
             rect = GUIUtils.Line(rect, GetExpressionDrawer().CalcInspectorHeight() + s_ExpressionPadding.Value.vertical);
             GUI.Box(rect, GUIContent.none, s_ExpressionStyle.Value);

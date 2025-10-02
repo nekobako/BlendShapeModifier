@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditorInternal;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -40,6 +41,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
             s_Content.image = null;
             s_Content.tooltip = string.Empty;
             return s_Content;
+        }
+
+        public static GUIContent TrText(string key)
+        {
+            return Text(CL4EE.Tr(key));
         }
 
         public static void Space()

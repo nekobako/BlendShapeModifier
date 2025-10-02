@@ -3,6 +3,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using CustomLocalization4EditorExtension;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -41,8 +42,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             EditorGUI.BeginDisabledGroup(IsOpenMaskTextureEditor());
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_SlotProperty, true), true);
-            var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.Text(m_SlotProperty.displayName), m_SlotProperty);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_SlotProperty, GUIUtils.TrText("filter-by-mask-expression-slot"), true), true);
+            var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.TrText("filter-by-mask-expression-slot"), m_SlotProperty);
 
             var propertyRect = EditorGUI.PrefixLabel(rect, propertyContent);
             if (EditorGUI.DropdownButton(propertyRect, GUIUtils.Text($"Element {m_SlotProperty.intValue}"), FocusType.Keyboard))
@@ -72,8 +73,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             EditorGUI.EndProperty();
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_MaskProperty, true));
-            EditorGUI.PropertyField(Rect.MinMaxRect(rect.xMin, rect.yMin, rect.xMax - k_MaskButtonWidth - k_MaskButtonSpacing, rect.yMax), m_MaskProperty, true);
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_MaskProperty, GUIUtils.TrText("filter-by-mask-expression-mask"), true));
+            EditorGUI.PropertyField(Rect.MinMaxRect(rect.xMin, rect.yMin, rect.xMax - k_MaskButtonWidth - k_MaskButtonSpacing, rect.yMax), m_MaskProperty, GUIUtils.TrText("filter-by-mask-expression-mask"), true);
 
             EditorGUI.EndDisabledGroup();
 
@@ -87,9 +88,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override float OnCalcInspectorHeight()
         {
-            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_SlotProperty, true), true);
+            var rect = GUIUtils.Line(default, EditorGUI.GetPropertyHeight(m_SlotProperty, GUIUtils.TrText("filter-by-mask-expression-slot"), true), true);
 
-            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_MaskProperty, true));
+            rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_MaskProperty, GUIUtils.TrText("filter-by-mask-expression-mask"), true));
 
             rect = GUIUtils.Line(rect, GetExpressionDrawer().CalcInspectorHeight() + s_ExpressionPadding.Value.vertical);
 
@@ -132,7 +133,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         private void DrawCreateMaskButton(Rect rect)
         {
-            if (GUI.Button(rect, "Create"))
+            if (GUI.Button(rect, GUIUtils.TrText("filter-by-mask-expression-create")))
             {
 #if BSM_MASK_TEXTURE_EDITOR
                 var mask = MaskTextureEditor.Editor.Utility.CreateTexture(s_DefaultMaskSize, s_DefaultMaskColor);
@@ -160,7 +161,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             EditorGUI.BeginChangeCheck();
 
-            var open = GUI.Toggle(rect, IsOpenMaskTextureEditor(), "Edit", GUI.skin.button);
+            var open = GUI.Toggle(rect, IsOpenMaskTextureEditor(), GUIUtils.TrText("filter-by-mask-expression-edit"), GUI.skin.button);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -185,11 +186,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
         private void ShowMaskTextureEditorDialog()
         {
             switch (EditorUtility.DisplayDialogComplex(
-                "Info",
-                "Mask Texture Editor is not installed.",
-                "Open VCC/ALCOM",
-                "Cancel",
-                "Open GitHub"))
+                CL4EE.Tr("mask-texture-editor-dialog-title"),
+                CL4EE.Tr("mask-texture-editor-dialog-message"),
+                CL4EE.Tr("mask-texture-editor-dialog-open-vcc"),
+                CL4EE.Tr("mask-texture-editor-dialog-cancel"),
+                CL4EE.Tr("mask-texture-editor-dialog-open-web")))
             {
                 case 0:
                     Application.OpenURL("vcc://vpm/addRepo?url=https://vpm.nekobako.net/index.json");
