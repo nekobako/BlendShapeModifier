@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
@@ -130,5 +128,3 @@ namespace net.nekobako.BlendShapeModifier.Editor
         }
     }
 }
-
-#endif

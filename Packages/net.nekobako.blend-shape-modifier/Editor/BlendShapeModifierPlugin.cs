@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using nadena.dev.ndmf;
 using nadena.dev.ndmf.animator;
 using net.nekobako.BlendShapeModifier.Editor;
@@ -23,5 +21,3 @@ namespace net.nekobako.BlendShapeModifier.Editor
         }
     }
 }
-
-#endif

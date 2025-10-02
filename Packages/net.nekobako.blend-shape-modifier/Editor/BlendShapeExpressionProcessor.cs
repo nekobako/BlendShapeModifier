@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System;
 using System.Collections.Generic;
 
@@ -40,5 +38,3 @@ namespace net.nekobako.BlendShapeModifier.Editor
         protected abstract void OnProcess(T expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results);
     }
 }
-
-#endif

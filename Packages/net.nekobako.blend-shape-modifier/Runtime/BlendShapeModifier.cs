@@ -1,14 +1,12 @@
-﻿#if BSM_VRCSDK3_AVATARS
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
-using VRC.SDKBase;
+using nadena.dev.ndmf;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
 {
     [HelpURL("https://blend-shape-modifier.nekobako.net")]
-    internal class BlendShapeModifier : MonoBehaviour, IEditorOnly
+    internal class BlendShapeModifier : MonoBehaviour, INDMFEditorOnly
     {
         [SerializeField, NotKeyable]
         public SkinnedMeshRenderer Renderer = null;
@@ -17,5 +15,3 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         public List<BlendShape> Shapes = new();
     }
 }
-
-#endif

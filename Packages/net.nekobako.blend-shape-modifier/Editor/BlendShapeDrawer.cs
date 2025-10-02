@@ -1,5 +1,3 @@
-#if BSM_VRCSDK3_AVATARS
-
 using System;
 using UnityEditor;
 using UnityEditorInternal;
@@ -626,5 +624,3 @@ namespace net.nekobako.BlendShapeModifier.Editor
         }
     }
 }
-
-#endif
