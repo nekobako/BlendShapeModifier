@@ -6,6 +6,7 @@ using net.nekobako.BlendShapeModifier.Editor;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
+    [RunsOnAllPlatforms]
     internal class BlendShapeModifierPlugin : Plugin<BlendShapeModifierPlugin>
     {
         public override string QualifiedName => "net.nekobako.blend-shape-modifier";
