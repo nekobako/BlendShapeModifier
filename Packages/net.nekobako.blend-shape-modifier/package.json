@@ -11,7 +11,6 @@
   "license": "MIT",
   "url": "https://github.com/nekobako/BlendShapeModifier/releases/download/0.0.1/net.nekobako.blend-shape-modifier-0.0.1.zip",
   "vpmDependencies": {
-    "com.vrchat.avatars": ">=3.8.2",
     "nadena.dev.ndmf": ">=1.8.2"
   }
 }
