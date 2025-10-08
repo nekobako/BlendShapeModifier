@@ -1,6 +1,6 @@
 {
   "name": "net.nekobako.blend-shape-modifier",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "displayName": "Blend Shape Modifier",
   "description": "A non-destructive tool to add and edit blend shapes for VRChat avatars",
   "unity": "2022.3",
@@ -9,7 +9,7 @@
     "url": "https://nekobako.net"
   },
   "license": "MIT",
-  "url": "https://github.com/nekobako/BlendShapeModifier/releases/download/0.0.1/net.nekobako.blend-shape-modifier-0.0.1.zip",
+  "url": "https://github.com/nekobako/BlendShapeModifier/releases/download/0.1.0/net.nekobako.blend-shape-modifier-0.1.0.zip",
   "vpmDependencies": {
     "nadena.dev.ndmf": ">=1.8.2"
   }
