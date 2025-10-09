@@ -30,7 +30,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 elementHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing,
                 onAddDropdownCallback = OnAddDropdown,
                 onRemoveCallback = OnRemove,
-                onSelectCallback = _ => GUIUtility.ExitGUI(),
             };
         }
 

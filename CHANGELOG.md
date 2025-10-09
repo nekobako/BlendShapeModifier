@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Remove unnecessary dependency to VRChat SDK.
 
 ### Fixed
+- Blend shapes and frames couldn't be reordered.
 
 ### Security
 

@@ -66,7 +66,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 onAddCallback = OnAdd,
                 onRemoveCallback = OnRemove,
                 onReorderCallback = OnReorder,
-                onSelectCallback = _ => GUIUtility.ExitGUI(),
             };
         }
 
@@ -356,9 +355,16 @@ namespace net.nekobako.BlendShapeModifier.Editor
             var floatFieldFormatString = GUIUtils.FloatFieldFormatString;
             GUIUtils.FloatFieldFormatString = k_MinMaxWeightFormat;
 
+            // Prevent input in DelayedFloatField from being applied to the wrong property when selecting an element in a ReorderableList
+            GUIUtility.GetControlID($"{m_FramesProperty.propertyPath}_MinWeight".GetHashCode(), FocusType.Passive);
+
             var newMinWeight = EditorGUI.DelayedFloatField(
                 new(rect.xMin + k_MinMaxWeightFieldWidth * 0.0f, rect.y, k_MinMaxWeightFieldWidth, rect.height),
                 minWeight, s_MinMaxWeightFieldStyle.Value);
+
+            // Prevent input in DelayedFloatField from being applied to the wrong property when selecting an element in a ReorderableList
+            GUIUtility.GetControlID($"{m_FramesProperty.propertyPath}_MaxWeight".GetHashCode(), FocusType.Passive);
+
             var newMaxWeight = EditorGUI.DelayedFloatField(
                 new(rect.xMax - k_MinMaxWeightFieldWidth * 1.0f, rect.y, k_MinMaxWeightFieldWidth, rect.height),
                 maxWeight, s_MinMaxWeightFieldStyle.Value);
@@ -458,6 +464,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
             rect.y = rect.center.y - EditorGUIUtility.singleLineHeight * 0.5f;
             rect.height = EditorGUIUtility.singleLineHeight;
             var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.Text($"#{index}"), frameWeightProperty);
+
+            // Prevent input in DelayedFloatField from being applied to the wrong property when selecting an element in a ReorderableList
+            GUIUtility.GetControlID(frameWeightProperty.propertyPath.GetHashCode(), FocusType.Passive);
 
             var propertyRect = EditorGUI.PrefixLabel(rect, propertyContent);
             EditorGUI.DelayedFloatField(propertyRect, frameWeightProperty, GUIContent.none);

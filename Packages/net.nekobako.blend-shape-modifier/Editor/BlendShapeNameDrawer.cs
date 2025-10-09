@@ -17,6 +17,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             content = EditorGUI.BeginProperty(rect, content, property);
 
+            // Prevent input in DelayedTextField from being applied to the wrong property when selecting an element in a ReorderableList
+            GUIUtility.GetControlID(property.propertyPath.GetHashCode(), FocusType.Passive);
+
             property.stringValue = EditorGUI.DelayedTextField(Rect.MinMaxRect(rect.xMin, rect.yMin, rect.xMax - s_DropDownStyle.Value.fixedWidth, rect.yMax), content, property.stringValue, s_DropDownTextStyle.Value);
 
             if (EditorGUI.DropdownButton(Rect.MinMaxRect(rect.xMax - s_DropDownStyle.Value.fixedWidth, rect.yMin, rect.xMax, rect.yMax), GUIContent.none, FocusType.Keyboard, s_DropDownStyle.Value))

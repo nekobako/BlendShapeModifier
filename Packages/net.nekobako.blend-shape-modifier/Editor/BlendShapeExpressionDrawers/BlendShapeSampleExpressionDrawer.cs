@@ -30,6 +30,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
             rect = GUIUtils.Line(rect, EditorGUI.GetPropertyHeight(m_WeightProperty, GUIUtils.TrText("sample-expression-weight"), true));
             var propertyContent = EditorGUI.BeginProperty(rect, GUIUtils.TrText("sample-expression-weight"), m_WeightProperty);
 
+            // Prevent input in DelayedFloatField from being applied to the wrong property when selecting an element in a ReorderableList
+            GUIUtility.GetControlID(m_WeightProperty.propertyPath.GetHashCode(), FocusType.Passive);
+
             var propertyRect = EditorGUI.PrefixLabel(rect, propertyContent);
             EditorGUI.DelayedFloatField(propertyRect, m_WeightProperty, GUIContent.none);
 

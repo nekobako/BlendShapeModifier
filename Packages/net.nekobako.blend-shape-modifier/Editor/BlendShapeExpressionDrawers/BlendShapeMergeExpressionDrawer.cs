@@ -29,7 +29,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 elementHeightCallback = ElementHeight,
                 onAddCallback = OnAdd,
                 onRemoveCallback = OnRemove,
-                onSelectCallback = _ => GUIUtility.ExitGUI(),
             };
             m_ExpressionDrawers = new();
         }
