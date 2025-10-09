@@ -22,4 +22,4 @@
 5. `プレビュー` を `有効` にして `新規シェイプ` の `ウェイト` を `0` から `100` まで変化させます。  
 0–50 の範囲と 50–100 の範囲で胸の動き方が異なることが確認できました。
 
-<video muted autoplay loop playsinline src="../videos/tutorials/multi-frames/multi-frames.mp4" />
+<video muted autoplay loop playsinline src="../videos/tutorials/multi-frames/multi-frames.mp4"></video>

@@ -22,4 +22,4 @@ In this example, we want to maximize both of the blend shapes that changes the b
 5. Switch `Preview` to `Enable` and change the `Weight` of the `New Shape` from `0` to `100`.  
 You can now see that the breasts move differently between the 0–50 range and the 50–100 range.
 
-<video muted autoplay loop playsinline src="../videos/tutorials/multi-frames/multi-frames.mp4" />
+<video muted autoplay loop playsinline src="../videos/tutorials/multi-frames/multi-frames.mp4"></video>

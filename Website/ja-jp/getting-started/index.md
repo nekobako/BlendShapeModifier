@@ -1,9 +1,12 @@
 # はじめに
 ブレンドシェイプモディファイヤーは、VRChat アバターのための非破壊ブレンドシェイプ追加/編集ツールです。
 
-<video muted autoplay loop playsinline src="../videos/getting-started/blend-shape-modifier.mp4" />
+<video muted autoplay loop playsinline src="../videos/getting-started/blend-shape-modifier.mp4"></video>
 
 既存のブレンドシェイプの限界突破や合成/分割、中間フレームの挿入などにより、新たなブレンドシェイプを作り出すことができます。  
 非破壊ツールなのでコンポーネントを削除するだけでいつでも元に戻すことができます。
 
 まずはツールのインストールとセットアップについて説明します。
+
+- [インストール](./installation)
+- [セットアップ](./setup)
