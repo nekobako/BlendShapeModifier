@@ -12,6 +12,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
     internal static class GUIUtils
     {
         private static readonly GUIContent s_Content = new();
+        private static readonly FieldInfo s_FloatFieldFormatString = typeof(EditorGUI).GetField("kFloatFieldFormatString", BindingFlags.NonPublic | BindingFlags.Static);
         private static readonly MethodInfo s_Slider = typeof(EditorGUI).GetMethod(nameof(EditorGUI.Slider), BindingFlags.NonPublic | BindingFlags.Static, null, new[]
         {
             typeof(Rect),
@@ -22,7 +23,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             typeof(float),
             typeof(GUIContent),
         }, null);
-        private static readonly FieldInfo s_FloatFieldFormatString = typeof(EditorGUI).GetField("kFloatFieldFormatString", BindingFlags.NonPublic | BindingFlags.Static);
         private static readonly MethodInfo s_DragNumberValueMethod = typeof(EditorGUI).GetMethod("DragNumberValue", BindingFlags.NonPublic | BindingFlags.Static, null, new[]
         {
             typeof(Rect),
@@ -76,15 +76,15 @@ namespace net.nekobako.BlendShapeModifier.Editor
             return list.selectedIndices.DefaultIfEmpty(-1).First();
         }
 
-        public static void Slider(Rect rect, SerializedProperty property, float sliderMin, float sliderMax, float fieldMin, float fieldMax, GUIContent content)
-        {
-            s_Slider.Invoke(null, new object[] { rect, property, sliderMin, sliderMax, fieldMin, fieldMax, content });
-        }
-
         public static string FloatFieldFormatString
         {
             get => s_FloatFieldFormatString.GetValue(null) as string;
             set => s_FloatFieldFormatString.SetValue(null, value);
+        }
+
+        public static void Slider(Rect rect, SerializedProperty property, float sliderMin, float sliderMax, float fieldMin, float fieldMax, GUIContent content)
+        {
+            s_Slider.Invoke(null, new object[] { rect, property, sliderMin, sliderMax, fieldMin, fieldMax, content });
         }
 
         public static float DragFloatLabel(Rect rect, string label, float value, float sensitivity, GUIStyle style)

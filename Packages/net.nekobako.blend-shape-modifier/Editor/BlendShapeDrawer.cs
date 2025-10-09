@@ -361,6 +361,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
             var newMinWeight = EditorGUI.DelayedFloatField(
                 new(rect.xMin + k_MinMaxWeightFieldWidth * 0.0f, rect.y, k_MinMaxWeightFieldWidth, rect.height),
                 minWeight, s_MinMaxWeightFieldStyle.Value);
+            newMinWeight = GUIUtils.DragFloatLabel(
+                new(rect.xMin + k_MinMaxWeightFieldWidth + k_MinMaxWeightLabelWidth * 0.0f, rect.y, k_MinMaxWeightLabelWidth, rect.height),
+                CL4EE.Tr("min-frame-weight"), newMinWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
 
             // Prevent input in DelayedFloatField from being applied to the wrong property when selecting an element in a ReorderableList
             GUIUtility.GetControlID($"{m_FramesProperty.propertyPath}_MaxWeight".GetHashCode(), FocusType.Passive);
@@ -368,10 +371,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             var newMaxWeight = EditorGUI.DelayedFloatField(
                 new(rect.xMax - k_MinMaxWeightFieldWidth * 1.0f, rect.y, k_MinMaxWeightFieldWidth, rect.height),
                 maxWeight, s_MinMaxWeightFieldStyle.Value);
-
-            newMinWeight = GUIUtils.DragFloatLabel(
-                new(rect.xMin + k_MinMaxWeightFieldWidth + k_MinMaxWeightLabelWidth * 0.0f, rect.y, k_MinMaxWeightLabelWidth, rect.height),
-                CL4EE.Tr("min-frame-weight"), newMinWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
             newMaxWeight = GUIUtils.DragFloatLabel(
                 new(rect.xMax - k_MinMaxWeightFieldWidth - k_MinMaxWeightLabelWidth * 1.0f, rect.y, k_MinMaxWeightLabelWidth, rect.height),
                 CL4EE.Tr("max-frame-weight"), newMaxWeight, (maxWeight - minWeight) / rect.width, s_MinMaxWeightLabelStyle.Value);
