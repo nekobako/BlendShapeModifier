@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Security
 
+## [1.0.0] - 2025-10-11
+
 ## [0.2.0] - 2025-10-11
 ### Added
 - Display blend shape names in the Animation Window.
