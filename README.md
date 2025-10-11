@@ -6,7 +6,7 @@ A non-destructive tool to add and edit blend shapes for VRChat avatars.
 You can create new blend shapes by exceeding the limits of existing ones, merging and filtering them, inserting intermediate frames, and more.  
 Since this is a non-destructive tool, you can always revert changes simply by removing the component.
 
-![Blend Shape Modifier](https://github.com/user-attachments/assets/a58fc21d-b204-4bd8-ad9c-24a27de5bef0)
+![Blend Shape Modifier](https://github.com/user-attachments/assets/116bdb6d-601f-4865-b5f2-36f2dfa5b26e)
 
 ## Installation
 1. Press `Add to VCC` button in [VPM Listing](https://vpm.nekobako.net) and add the repository.

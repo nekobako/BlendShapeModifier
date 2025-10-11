@@ -6,7 +6,7 @@ VRChat アバターのための非破壊ブレンドシェイプ追加/編集ツ
 既存のブレンドシェイプの限界突破や合成/分割、中間フレームの挿入などにより、新たなブレンドシェイプを作り出すことができます。  
 非破壊ツールなのでコンポーネントを削除するだけでいつでも元に戻すことができます。
 
-![ブレンドシェイプモディファイヤー](https://github.com/user-attachments/assets/edba1b89-6844-4e8d-9791-5f29fc077e44)
+![ブレンドシェイプモディファイヤー](https://github.com/user-attachments/assets/72d4af64-2520-4e7b-b2f7-c420ee9d6f36)
 
 ## インストール
 1. [VPM Listing](https://vpm.nekobako.net) の `Add to VCC` ボタンを押してリポジトリを追加します。
