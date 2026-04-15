@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -16,13 +17,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         protected override void Execute(BuildContext context)
         {
-            foreach (var modifier in context.AvatarRootObject.GetComponentsInChildren<BlendShapeModifier>(true))
-            {
-                if (!modifier.Renderer || !modifier.Renderer.sharedMesh)
-                {
-                    return;
-                }
+            var modifiers = context.AvatarRootObject.GetComponentsInChildren<BlendShapeModifier>(true);
 
+            foreach (var modifier in modifiers
+                .Where(x => x.Renderer && x.Renderer.sharedMesh))
+            {
                 modifier.Renderer.sharedMesh = BlendShapeModifierProcessor.GenerateMesh(modifier);
 
                 BlendShapeModifierProcessor.ApplyWeights(modifier, modifier.Renderer);
@@ -53,7 +52,10 @@ namespace net.nekobako.BlendShapeModifier.Editor
                         clip.SetFloatCurve(target, curve);
                     }
                 });
+            }
 
+            foreach (var modifier in modifiers)
+            {
                 Object.DestroyImmediate(modifier);
             }
         }
