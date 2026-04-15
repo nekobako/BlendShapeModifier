@@ -47,7 +47,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             var mesh = Object.Instantiate(modifier.Renderer.sharedMesh);
 
             using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + modifier.Shapes.Count, Allocator.Temp);
-
             var blendShapesSpan = blendShapes.AsSpan();
             var blendShapeFrameIndex = 0;
             for (var i = 0; i < blendShapesSpan.Length; i++)
@@ -60,7 +59,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             }
 
             using var blendShapeFrames = new NativeArray<BlendShapeFrame>(blendShapeFrameIndex, Allocator.Temp);
-
             var blendShapeFramesSpan = blendShapeFrames.AsSpan();
             var blendShapeDeltaIndex = 0;
             for (var i = 0; i < blendShapesSpan.Length; i++)
@@ -77,7 +75,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             }
 
             using var blendShapeDeltas = new NativeArray<BlendShapeDelta>(blendShapeDeltaIndex, Allocator.Temp);
-
             var blendShapeDeltasSpan = blendShapeDeltas.AsSpan();
             var deltaPositionBuffer = new Vector3[mesh.vertexCount];
             var deltaNormalBuffer = new Vector3[mesh.vertexCount];

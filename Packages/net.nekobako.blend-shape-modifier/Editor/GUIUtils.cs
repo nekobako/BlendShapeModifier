@@ -23,7 +23,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             typeof(float),
             typeof(GUIContent),
         }, null);
-        private static readonly MethodInfo s_DragNumberValueMethod = typeof(EditorGUI).GetMethod("DragNumberValue", BindingFlags.NonPublic | BindingFlags.Static, null, new[]
+        private static readonly MethodInfo s_DragNumberValue = typeof(EditorGUI).GetMethod("DragNumberValue", BindingFlags.NonPublic | BindingFlags.Static, null, new[]
         {
             typeof(Rect),
             typeof(int),
@@ -91,7 +91,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             var parameters = new object[] { rect, GUIUtility.GetControlID(FocusType.Passive), true, (double)value, 0L, sensitivity };
             EditorGUI.LabelField(rect, label, style);
-            s_DragNumberValueMethod.Invoke(null, parameters);
+            s_DragNumberValue.Invoke(null, parameters);
             return (float)(double)parameters[3];
         }
 
