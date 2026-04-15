@@ -1,5 +1,4 @@
 using System;
-using System.Buffers;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,12 +9,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
     internal class BlendShapeFilterByAxisExpressionDrawer : BlendShapeExpressionDrawer<BlendShapeFilterByAxisExpression>
     {
         private const float k_ButtonSpacing = 2.0f;
-        private const float k_DottedLineSize = 4.0f;
-        private static readonly int[] s_LineIndices = { 0, 2, 4, 6, 0, 4, 2, 6, 1, 3, 5, 7, 1, 5, 3, 7 };
-        private static readonly int[] s_DottedLineIndices = { 0, 1, 2, 3, 4, 5, 6, 7 };
-        private static readonly Color s_HandleColor = new(0.0f, 0.0f, 0.0f, 0.4f);
-        private static readonly Color s_ActiveHandleColor = new(0.0f, 0.0f, 0.0f, 0.8f);
-        private static readonly Color s_InactiveHandleColor = new(0.0f, 0.0f, 0.0f, 0.2f);
+        private const float k_HandleSize = 2.0f;
+        private const float k_HandleThickness = 2.0f;
+        private static readonly Color s_HandleColor = new(1.0f, 1.0f, 1.0f, 0.4f);
+        private static readonly Color s_ActiveHandleColor = new(1.0f, 1.0f, 1.0f, 0.8f);
+        private static readonly Color s_InactiveHandleColor = new(1.0f, 1.0f, 1.0f, 0.2f);
         private static readonly Lazy<RectOffset> s_ExpressionPadding = new(() => new(21, 7, 5, 6));
         private static readonly Lazy<GUIStyle> s_HeaderStyle = new(() => new("RL Empty Header"));
         private static readonly Lazy<GUIStyle> s_ExpressionStyle = new(() => new("RL Background"));
@@ -27,8 +25,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         private readonly SerializedProperty m_FalloffRangeProperty = null;
         private readonly SerializedProperty m_ExpressionProperty = null;
         private BlendShapeExpressionDrawer m_ExpressionDrawer = null;
-        private Quaternion m_Rotation = Quaternion.identity;
-        private Vector3 m_Direction = Vector3.forward;
+        private Quaternion m_HandleRotation = Quaternion.identity;
 
         [InitializeOnLoadMethod]
         private static void Initialize()
@@ -106,11 +103,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
             {
                 var position = modifier.Renderer.transform.TransformPoint(m_PositionProperty.vector3Value);
                 var direction = modifier.Renderer.transform.TransformDirection(m_DirectionProperty.vector3Value);
-                if (m_Direction != direction)
-                {
-                    m_Rotation = Quaternion.LookRotation(direction, modifier.Renderer.transform.up);
-                    m_Direction = direction;
-                }
 
                 var handlesColor = Handles.color;
                 Handles.color =
@@ -118,21 +110,21 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     IsEditing() ? s_InactiveHandleColor :
                     s_HandleColor;
 
-                var size = HandleUtility.GetHandleSize(position);
-                var offset = m_FalloffRangeProperty.floatValue * 0.5f;
-                var points = ArrayPool<Vector3>.Shared.Rent(8);
-                points[0] = position + m_Rotation * new Vector3(-size, -size, -offset);
-                points[1] = position + m_Rotation * new Vector3(-size, -size, +offset);
-                points[2] = position + m_Rotation * new Vector3(-size, +size, -offset);
-                points[3] = position + m_Rotation * new Vector3(-size, +size, +offset);
-                points[4] = position + m_Rotation * new Vector3(+size, -size, -offset);
-                points[5] = position + m_Rotation * new Vector3(+size, -size, +offset);
-                points[6] = position + m_Rotation * new Vector3(+size, +size, -offset);
-                points[7] = position + m_Rotation * new Vector3(+size, +size, +offset);
-                Handles.DrawLines(points, s_LineIndices);
-                Handles.DrawDottedLines(points, s_DottedLineIndices, k_DottedLineSize);
-                Handles.ArrowHandleCap(0, position, m_Rotation, size, EventType.Repaint);
-                ArrayPool<Vector3>.Shared.Return(points);
+                var size = HandleUtility.GetHandleSize(position) * k_HandleSize;
+                var vector = modifier.Renderer.transform.TransformVector(m_DirectionProperty.vector3Value);
+                Handles.ArrowHandleCap(0, position, Quaternion.LookRotation(vector, modifier.Renderer.transform.up), size, EventType.Repaint);
+
+                var normal = modifier.Renderer.transform.worldToLocalMatrix.transpose.MultiplyVector(m_DirectionProperty.vector3Value).normalized;
+                if (m_FalloffRangeProperty.floatValue == 0.0f)
+                {
+                    Handles.DrawWireDisc(position, normal, size, k_HandleThickness);
+                }
+                else
+                {
+                    var offset = modifier.Renderer.transform.TransformVector(m_DirectionProperty.vector3Value.normalized * (m_FalloffRangeProperty.floatValue * 0.5f));
+                    Handles.DrawWireDisc(position + offset, normal, size, k_HandleThickness);
+                    Handles.DrawWireDisc(position - offset, normal, size, k_HandleThickness);
+                }
 
                 Handles.color = handlesColor;
 
@@ -140,10 +132,18 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 {
                     EditorGUI.BeginChangeCheck();
 
-                    position = Handles.PositionHandle(position, m_Rotation);
-                    m_Rotation = Handles.RotationHandle(m_Rotation, position);
-                    direction = m_Rotation * Vector3.forward;
-                    m_Direction = direction;
+                    m_HandleRotation = Tools.pivotRotation switch
+                    {
+                        PivotRotation.Local when direction.normalized != m_HandleRotation * Vector3.forward => Quaternion.LookRotation(direction, modifier.Renderer.transform.up),
+                        PivotRotation.Global when GUIUtility.hotControl == 0 => Quaternion.identity,
+                        _ => m_HandleRotation
+                    };
+
+                    var rotation = Handles.RotationHandle(m_HandleRotation, position);
+                    position = Handles.PositionHandle(position, rotation);
+                    direction = rotation * Quaternion.Inverse(m_HandleRotation) * direction.normalized;
+
+                    m_HandleRotation = rotation;
 
                     if (EditorGUI.EndChangeCheck())
                     {

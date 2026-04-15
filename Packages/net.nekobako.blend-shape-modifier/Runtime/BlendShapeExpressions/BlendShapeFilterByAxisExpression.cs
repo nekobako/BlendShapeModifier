@@ -13,7 +13,7 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         [SerializeField, NotKeyable]
         public Vector3 Direction = Vector3.left;
 
-        [SerializeField, NotKeyable]
+        [SerializeField, NotKeyable, Min(0.0f)]
         public float FalloffRange = 0.0f;
 
         [SerializeReference, NotKeyable]
