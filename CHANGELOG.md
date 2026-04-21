@@ -8,16 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 ### Changed
-- Improve Blend Shape Filter By Axis Expression editor.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-- Components with invalid configurations were not destroyed.
 
 ### Security
+
+## [1.1.0] - 2025-10-11
+### Changed
+- Improve Blend Shape Filter By Axis Expression editor.
+
+### Fixed
+- Components with invalid configurations were not destroyed.
 
 ## [1.0.0] - 2025-10-11
 
