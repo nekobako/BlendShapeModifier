@@ -14,7 +14,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
     {
         public readonly ref struct Context
         {
-            public BlendShapeModifier Modifier { get; init; }
+            public SkinnedMeshRenderer OriginalRenderer { get; init; }
+            public SkinnedMeshRenderer ProxyRenderer { get; init; }
             public ComputeContext ComputeContext { get; init; }
             public ReadOnlySpan<BlendShape> BlendShapes { get; init; }
             public ReadOnlySpan<BlendShapeFrame> BlendShapeFrames { get; init; }
@@ -42,9 +43,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public Vector3 Tangent;
         }
 
-        public static Mesh GenerateMesh(BlendShapeModifier modifier, ComputeContext context = null)
+        public static Mesh GenerateMesh(SkinnedMeshRenderer renderer, BlendShapeModifier modifier)
         {
-            var mesh = Object.Instantiate(modifier.Renderer.sharedMesh);
+            return GenerateMesh(renderer, renderer, modifier, ComputeContext.NullContext);
+        }
+
+        public static Mesh GenerateMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
+        {
+            var mesh = Object.Instantiate(proxy.sharedMesh);
 
             using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + modifier.Shapes.Count, Allocator.Temp);
             var blendShapesSpan = blendShapes.AsSpan();
@@ -102,8 +108,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
                             modifier.Shapes[i - mesh.blendShapeCount].Frames[j].Expression,
                             new()
                             {
-                                Modifier = modifier,
-                                ComputeContext = context ?? ComputeContext.NullContext,
+                                OriginalRenderer = original,
+                                ProxyRenderer = proxy,
+                                ComputeContext = context,
                                 BlendShapes = blendShapesSpan[..i],
                                 BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
                                 BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
@@ -157,7 +164,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             return mesh;
         }
 
-        public static void ApplyWeights(BlendShapeModifier modifier, SkinnedMeshRenderer renderer)
+        public static void ApplyWeights(SkinnedMeshRenderer renderer, BlendShapeModifier modifier)
         {
             foreach (var shape in modifier.Shapes)
             {

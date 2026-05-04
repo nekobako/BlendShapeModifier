@@ -22,9 +22,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
             foreach (var modifier in modifiers
                 .Where(x => x.Renderer && x.Renderer.sharedMesh))
             {
-                modifier.Renderer.sharedMesh = BlendShapeModifierProcessor.GenerateMesh(modifier);
+                modifier.Renderer.sharedMesh = BlendShapeModifierProcessor.GenerateMesh(modifier.Renderer, modifier);
 
-                BlendShapeModifierProcessor.ApplyWeights(modifier, modifier.Renderer);
+                BlendShapeModifierProcessor.ApplyWeights(modifier.Renderer, modifier);
 
                 var asc = context.Extension<AnimatorServicesContext>();
                 var map = new Dictionary<EditorCurveBinding, EditorCurveBinding>();

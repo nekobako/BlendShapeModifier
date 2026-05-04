@@ -33,8 +33,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         public Task<IRenderFilterNode> Instantiate(RenderGroup group, IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context)
         {
+            var (original, proxy) = pairs.Single();
             var modifier = group.GetData<BlendShapeModifier>();
-            var node = new Node(modifier, context);
+            var node = new Node(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, modifier, context);
             return Task.FromResult<IRenderFilterNode>(node);
         }
 
@@ -47,12 +48,12 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             public RenderAspects WhatChanged { get; private set; }
 
-            public Node(BlendShapeModifier modifier, ComputeContext context)
+            public Node(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
             {
                 m_Modifier = modifier;
                 CreateContexts(context);
 
-                m_Mesh = BlendShapeModifierProcessor.GenerateMesh(modifier, m_MeshContext);
+                m_Mesh = BlendShapeModifierProcessor.GenerateMesh(original, proxy, modifier, m_MeshContext);
             }
 
             public Task<IRenderFilterNode> Refresh(IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context, RenderAspects aspects)
@@ -96,7 +97,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
                 renderer.sharedMesh = m_Mesh;
 
-                BlendShapeModifierProcessor.ApplyWeights(m_Modifier, renderer);
+                BlendShapeModifierProcessor.ApplyWeights(renderer, m_Modifier);
             }
 
             public void Dispose()
