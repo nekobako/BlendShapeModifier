@@ -19,14 +19,15 @@ namespace net.nekobako.BlendShapeModifier.Editor
         {
             var modifiers = context.AvatarRootObject.GetComponentsInChildren<BlendShapeModifier>(true);
 
-            foreach (var modifier in modifiers
-                .Where(x => x.Renderer && x.Renderer.sharedMesh))
+            foreach (var grouping in modifiers
+                .Where(x => x.Renderer && x.Renderer.sharedMesh)
+                .GroupBy(x => x.Renderer))
             {
-                BlendShapeModifierProcessor.Process(modifier);
+                BlendShapeModifierProcessor.Process(grouping.Key, grouping.ToArray());
 
                 var asc = context.Extension<AnimatorServicesContext>();
                 var map = new Dictionary<EditorCurveBinding, EditorCurveBinding>();
-                foreach (var shape in modifier.Shapes)
+                foreach (var (modifier, shape) in grouping.SelectMany(x => x.Shapes, (x, y) => (x, y)))
                 {
                     var source = EditorCurveBinding.SerializeReferenceCurve(
                         asc.ObjectPathRemapper.GetVirtualPathForObject(modifier.transform),

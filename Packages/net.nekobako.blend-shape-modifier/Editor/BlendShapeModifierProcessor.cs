@@ -43,15 +43,17 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public Vector3 Tangent;
         }
 
-        public static void Process(BlendShapeModifier modifier)
+        public static void Process(SkinnedMeshRenderer renderer, BlendShapeModifier[] modifiers)
         {
-            ProcessMesh(modifier.Renderer, modifier.Renderer, modifier, ComputeContext.NullContext);
-            ProcessShapes(modifier.Renderer, modifier.Renderer, modifier, ComputeContext.NullContext);
+            ProcessMesh(renderer, renderer, modifiers, ComputeContext.NullContext);
+            ProcessShapes(renderer, renderer, modifiers, ComputeContext.NullContext);
         }
 
-        public static void ProcessMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
+        public static void ProcessMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier[] modifiers, ComputeContext context)
         {
-            var shapes = context.Observe(modifier, x => x.Shapes.Select(y => y.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual);
+            var shapes = modifiers
+                .SelectMany(x => context.Observe(x, y => y.Shapes.Select(z => z.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual))
+                .ToArray();
 
             var mesh = Object.Instantiate(proxy.sharedMesh);
 
@@ -167,9 +169,10 @@ namespace net.nekobako.BlendShapeModifier.Editor
             proxy.sharedMesh = mesh;
         }
 
-        public static void ProcessShapes(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
+        public static void ProcessShapes(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier[] modifiers, ComputeContext context)
         {
-            foreach (var shape in context.Observe(modifier, x => x.Shapes.Select(y => y.Clone()).ToArray(), Enumerable.SequenceEqual))
+            foreach (var shape in modifiers
+                .SelectMany(x => context.Observe(x, y => y.Shapes.Select(z => z.Clone()).ToArray(), Enumerable.SequenceEqual)))
             {
                 var index = proxy.sharedMesh.GetBlendShapeIndex(shape.Name);
                 if (index >= 0 && index < proxy.sharedMesh.blendShapeCount)
