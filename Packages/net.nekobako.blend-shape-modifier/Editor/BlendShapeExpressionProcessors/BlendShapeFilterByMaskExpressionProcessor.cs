@@ -34,7 +34,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             context.ComputeContext.Observe(mask, x => x.imageContentsHash);
 
 #if BSM_MASK_TEXTURE_EDITOR
-            var editing = MaskTextureEditor.Editor.Window.ObserveTextureFor(context.ComputeContext, expression.Mask, context.Modifier.Renderer, expression.Slot,
+            var editing = MaskTextureEditor.Editor.Window.ObserveTextureFor(context.ComputeContext, expression.Mask, context.OriginalRenderer, expression.Slot,
                 BlendShapeFilterByMaskExpressionDrawer.MaskTextureEditorToken);
             if (editing)
             {
@@ -61,8 +61,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 RenderTexture.ReleaseTemporary(rt);
             }
 
-            var uv = context.Modifier.Renderer.sharedMesh.uv;
-            var indices = context.Modifier.Renderer.sharedMesh.GetIndices(Mathf.Min(expression.Slot, context.Modifier.Renderer.sharedMesh.subMeshCount - 1)).ToHashSet();
+            var uv = context.ProxyRenderer.sharedMesh.uv;
+            var indices = context.ProxyRenderer.sharedMesh.GetIndices(Mathf.Min(expression.Slot, context.ProxyRenderer.sharedMesh.subMeshCount - 1)).ToHashSet();
             for (var i = 0; i < results.Length; i++)
             {
                 ref var result = ref results[i];

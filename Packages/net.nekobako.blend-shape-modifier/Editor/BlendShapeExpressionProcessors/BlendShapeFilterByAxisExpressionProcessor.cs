@@ -25,9 +25,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
             Process(expression.Expression, context, results);
 
             var mesh = new Mesh();
-            context.Modifier.Renderer.BakeMesh(mesh, true);
-
-            context.ComputeContext.ObserveTransformPosition(context.Modifier.Renderer.transform);
+            context.OriginalRenderer.BakeMesh(mesh, true);
+            context.ComputeContext.ObserveTransformPosition(context.OriginalRenderer.transform);
 
             var vertices = mesh.vertices;
             for (var i = 0; i < results.Length; i++)

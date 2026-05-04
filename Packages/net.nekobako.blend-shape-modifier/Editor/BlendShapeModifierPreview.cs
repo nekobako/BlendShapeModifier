@@ -34,7 +34,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         public Task<IRenderFilterNode> Instantiate(RenderGroup group, IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context)
         {
             var modifier = group.GetData<BlendShapeModifier>();
-            var node = new Node(modifier, context);
+            var node = new Node(pairs, modifier, context);
             return Task.FromResult<IRenderFilterNode>(node);
         }
 
@@ -50,16 +50,19 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             public RenderAspects WhatChanged { get; private set; } = RenderAspects.Mesh | RenderAspects.Shapes;
 
-            public Node(BlendShapeModifier modifier, ComputeContext context)
+            public Node(IEnumerable<(Renderer, Renderer)> pairs, BlendShapeModifier modifier, ComputeContext context)
             {
+                var (original, proxy) = pairs.Single();
                 m_MeshContext = new(k_MeshContextDescription);
-                m_MeshContext.Observe(modifier, x => x.Shapes.Select(y => y.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual);
-
                 m_ShapesContext = new(k_ShapesContextDescription);
-                m_ShapesContext.Observe(modifier, x => x.Shapes.Select(y => y.Weight).ToArray(), Enumerable.SequenceEqual);
+                BlendShapeModifierProcessor.ProcessMesh(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, modifier, m_MeshContext);
+                BlendShapeModifierProcessor.ProcessShapes(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, modifier, m_ShapesContext);
 
                 m_Modifier = modifier;
-                m_Mesh = BlendShapeModifierProcessor.GenerateMesh(modifier, m_MeshContext);
+                if (proxy is SkinnedMeshRenderer renderer)
+                {
+                    m_Mesh = renderer.sharedMesh;
+                }
 
                 m_MeshContext.Invalidates(context);
                 m_ShapesContext.Invalidates(context);
@@ -72,7 +75,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     // Returning null here forcibly passes RenderAspects.Everything to Refresh() of downstream nodes
                     // return Task.FromResult<IRenderFilterNode>(null);
 
-                    var node = new Node(m_Modifier, context);
+                    var node = new Node(pairs, m_Modifier, context);
                     return Task.FromResult<IRenderFilterNode>(node);
                 }
 
@@ -82,8 +85,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 {
                     WhatChanged |= RenderAspects.Shapes;
 
+                    var (original, proxy) = pairs.Single();
                     m_ShapesContext = new(k_ShapesContextDescription);
-                    m_ShapesContext.Observe(m_Modifier, x => x.Shapes.Select(y => y.Weight).ToArray(), Enumerable.SequenceEqual);
+                    BlendShapeModifierProcessor.ProcessShapes(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, m_Modifier, m_ShapesContext);
                 }
 
                 m_MeshContext.Invalidates(context);
@@ -94,14 +98,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             public void OnFrame(Renderer original, Renderer proxy)
             {
-                if (proxy is not SkinnedMeshRenderer renderer)
+                if (proxy is SkinnedMeshRenderer renderer)
                 {
-                    return;
+                    renderer.sharedMesh = m_Mesh;
                 }
-
-                renderer.sharedMesh = m_Mesh;
-
-                BlendShapeModifierProcessor.ApplyWeights(m_Modifier, renderer);
+                BlendShapeModifierProcessor.ProcessShapes(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, m_Modifier, ComputeContext.NullContext);
             }
 
             public void Dispose()

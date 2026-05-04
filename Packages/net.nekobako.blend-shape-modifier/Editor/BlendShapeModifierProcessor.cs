@@ -14,7 +14,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
     {
         public readonly ref struct Context
         {
-            public BlendShapeModifier Modifier { get; init; }
+            public SkinnedMeshRenderer OriginalRenderer { get; init; }
+            public SkinnedMeshRenderer ProxyRenderer { get; init; }
             public ComputeContext ComputeContext { get; init; }
             public ReadOnlySpan<BlendShape> BlendShapes { get; init; }
             public ReadOnlySpan<BlendShapeFrame> BlendShapeFrames { get; init; }
@@ -42,19 +43,27 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public Vector3 Tangent;
         }
 
-        public static Mesh GenerateMesh(BlendShapeModifier modifier, ComputeContext context = null)
+        public static void Process(BlendShapeModifier modifier)
         {
-            var mesh = Object.Instantiate(modifier.Renderer.sharedMesh);
+            ProcessMesh(modifier.Renderer, modifier.Renderer, modifier, ComputeContext.NullContext);
+            ProcessShapes(modifier.Renderer, modifier.Renderer, modifier, ComputeContext.NullContext);
+        }
 
-            using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + modifier.Shapes.Count, Allocator.Temp);
+        public static void ProcessMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
+        {
+            var shapes = context.Observe(modifier, x => x.Shapes.Select(y => y.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual);
+
+            var mesh = Object.Instantiate(proxy.sharedMesh);
+
+            using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + shapes.Length, Allocator.Temp);
             var blendShapesSpan = blendShapes.AsSpan();
             var blendShapeFrameIndex = 0;
             for (var i = 0; i < blendShapesSpan.Length; i++)
             {
                 ref var blendShape = ref blendShapesSpan[i];
-                blendShape.Name = i < mesh.blendShapeCount ? mesh.GetBlendShapeName(i) : modifier.Shapes[i - mesh.blendShapeCount].Name;
+                blendShape.Name = i < mesh.blendShapeCount ? mesh.GetBlendShapeName(i) : shapes[i - mesh.blendShapeCount].Name;
                 blendShape.FrameIndex = blendShapeFrameIndex;
-                blendShape.FrameCount = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameCount(i) : modifier.Shapes[i - mesh.blendShapeCount].Frames.Count;
+                blendShape.FrameCount = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameCount(i) : shapes[i - mesh.blendShapeCount].Frames.Count;
                 blendShapeFrameIndex += blendShape.FrameCount;
             }
 
@@ -67,7 +76,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 for (var j = 0; j < blendShape.FrameCount; j++)
                 {
                     ref var blendShapeFrame = ref blendShapeFramesSpan[blendShape.FrameIndex + j];
-                    blendShapeFrame.Weight = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameWeight(i, j) : modifier.Shapes[i - mesh.blendShapeCount].Frames[j].Weight;
+                    blendShapeFrame.Weight = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameWeight(i, j) : shapes[i - mesh.blendShapeCount].Frames[j].Weight;
                     blendShapeFrame.DeltaIndex = blendShapeDeltaIndex;
                     blendShapeFrame.DeltaCount = mesh.vertexCount;
                     blendShapeDeltaIndex += blendShapeFrame.DeltaCount;
@@ -99,11 +108,12 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     else
                     {
                         BlendShapeExpressionProcessor.Process(
-                            modifier.Shapes[i - mesh.blendShapeCount].Frames[j].Expression,
+                            shapes[i - mesh.blendShapeCount].Frames[j].Expression,
                             new()
                             {
-                                Modifier = modifier,
-                                ComputeContext = context ?? ComputeContext.NullContext,
+                                OriginalRenderer = original,
+                                ProxyRenderer = proxy,
+                                ComputeContext = context,
                                 BlendShapes = blendShapesSpan[..i],
                                 BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
                                 BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
@@ -154,17 +164,17 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
             }
 
-            return mesh;
+            proxy.sharedMesh = mesh;
         }
 
-        public static void ApplyWeights(BlendShapeModifier modifier, SkinnedMeshRenderer renderer)
+        public static void ProcessShapes(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
         {
-            foreach (var shape in modifier.Shapes)
+            foreach (var shape in context.Observe(modifier, x => x.Shapes.Select(y => y.Clone()).ToArray(), Enumerable.SequenceEqual))
             {
-                var index = renderer.sharedMesh.GetBlendShapeIndex(shape.Name);
-                if (index >= 0 && index < renderer.sharedMesh.blendShapeCount)
+                var index = proxy.sharedMesh.GetBlendShapeIndex(shape.Name);
+                if (index >= 0 && index < proxy.sharedMesh.blendShapeCount)
                 {
-                    renderer.SetBlendShapeWeight(index, shape.Weight);
+                    proxy.SetBlendShapeWeight(index, shape.Weight);
                 }
             }
         }
