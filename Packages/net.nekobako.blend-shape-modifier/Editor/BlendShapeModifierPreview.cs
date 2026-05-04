@@ -26,7 +26,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
         public ImmutableList<RenderGroup> GetTargetGroups(ComputeContext context)
         {
             return context.GetComponentsByType<BlendShapeModifier>()
-                .Where(x => context.Observe(x, y => y.Renderer) && context.Observe(x, y => y.Renderer.sharedMesh))
+                .Where(x => context.Observe(x, y => y.Renderer) && context.Observe(x.Renderer, y => y.sharedMesh))
                 .Select(x => RenderGroup.For(x.Renderer).WithData(x))
                 .ToImmutableList();
         }

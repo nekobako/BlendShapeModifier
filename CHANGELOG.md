@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - BlendShapeFilterByMaskExpression was not correctly handling meshes with multiple submeshes.
+- Mesh replacement was not being correctly observed in the preview.
 
 ### Security
 
