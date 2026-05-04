@@ -34,53 +34,61 @@ namespace net.nekobako.BlendShapeModifier.Editor
         public Task<IRenderFilterNode> Instantiate(RenderGroup group, IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context)
         {
             var modifier = group.GetData<BlendShapeModifier>();
-            var node = new Node(modifier);
-            return node.Refresh(pairs, context, 0);
+            var node = new Node(modifier, context);
+            return Task.FromResult<IRenderFilterNode>(node);
         }
 
         private class Node : IRenderFilterNode
         {
+            private const string k_MeshContextDescription = "BlendShapeModifierPreview.Node.MeshContext";
+            private const string k_ShapesContextDescription = "BlendShapeModifierPreview.Node.ShapesContext";
+
             private readonly BlendShapeModifier m_Modifier = null;
             private readonly Mesh m_Mesh = null;
+            private readonly ComputeContext m_MeshContext = null;
             private ComputeContext m_ShapesContext = null;
-            private ComputeContext m_WeightsContext = null;
 
-            public RenderAspects WhatChanged { get; private set; }
+            public RenderAspects WhatChanged { get; private set; } = RenderAspects.Mesh | RenderAspects.Shapes;
 
-            public Node(BlendShapeModifier modifier)
+            public Node(BlendShapeModifier modifier, ComputeContext context)
             {
+                m_MeshContext = new(k_MeshContextDescription);
+                m_MeshContext.Observe(modifier, x => x.Shapes.Select(y => y.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual);
+
+                m_ShapesContext = new(k_ShapesContextDescription);
+                m_ShapesContext.Observe(modifier, x => x.Shapes.Select(y => y.Weight).ToArray(), Enumerable.SequenceEqual);
+
                 m_Modifier = modifier;
-                m_ShapesContext = new("BlendShapeModifierPreview.Shapes");
-                m_WeightsContext = new("BlendShapeModifierPreview.Weights");
-                m_Mesh = BlendShapeModifierProcessor.GenerateMesh(modifier, m_ShapesContext);
+                m_Mesh = BlendShapeModifierProcessor.GenerateMesh(modifier, m_MeshContext);
+
+                m_MeshContext.Invalidates(context);
+                m_ShapesContext.Invalidates(context);
             }
 
             public Task<IRenderFilterNode> Refresh(IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context, RenderAspects aspects)
             {
-                if ((aspects & RenderAspects.Mesh) != 0)
+                if (aspects.HasFlag(RenderAspects.Mesh) || m_MeshContext.IsInvalidated)
                 {
-                    return Task.FromResult<IRenderFilterNode>(null);
-                }
+                    // Returning null here forcibly passes RenderAspects.Everything to Refresh() of downstream nodes
+                    // return Task.FromResult<IRenderFilterNode>(null);
 
-                m_ShapesContext.Invalidates(context);
-                m_ShapesContext.Observe(m_Modifier, x => x.Shapes.Select(y => y.Clone(0.0f)).ToImmutableList(), Enumerable.SequenceEqual);
-                if (m_ShapesContext.IsInvalidated)
-                {
-                    WhatChanged = RenderAspects.Mesh;
-                    m_ShapesContext = new("BlendShapeModifierPreview.Shapes");
-                    return Task.FromResult<IRenderFilterNode>(null);
-                }
-
-                m_WeightsContext.Invalidates(context);
-                m_WeightsContext.Observe(m_Modifier, x => x.Shapes.Select(y => y.Weight).ToImmutableList(), Enumerable.SequenceEqual);
-                if (m_WeightsContext.IsInvalidated)
-                {
-                    WhatChanged = RenderAspects.Shapes;
-                    m_WeightsContext = new("BlendShapeModifierPreview.Weights");
-                    return Task.FromResult<IRenderFilterNode>(this);
+                    var node = new Node(m_Modifier, context);
+                    return Task.FromResult<IRenderFilterNode>(node);
                 }
 
                 WhatChanged = 0;
+
+                if (m_ShapesContext.IsInvalidated)
+                {
+                    WhatChanged |= RenderAspects.Shapes;
+
+                    m_ShapesContext = new(k_ShapesContextDescription);
+                    m_ShapesContext.Observe(m_Modifier, x => x.Shapes.Select(y => y.Weight).ToArray(), Enumerable.SequenceEqual);
+                }
+
+                m_MeshContext.Invalidates(context);
+                m_ShapesContext.Invalidates(context);
+
                 return Task.FromResult<IRenderFilterNode>(this);
             }
 
@@ -98,6 +106,9 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             public void Dispose()
             {
+                m_MeshContext.Invalidate();
+                m_ShapesContext.Invalidate();
+
                 Object.DestroyImmediate(m_Mesh);
             }
         }
