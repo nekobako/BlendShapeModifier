@@ -43,8 +43,15 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             EditorGUILayout.BeginHorizontal();
 
+            EditorGUI.BeginChangeCheck();
+
             EditorGUILayout.PrefixLabel(GUIUtils.TrText("preview"));
-            BlendShapeModifierPreview.PreviewNode.IsEnabled.Value = GUILayout.Toolbar(BlendShapeModifierPreview.PreviewNode.IsEnabled.Value ? 1 : 0, new[] { CL4EE.Tr("disable-preview"), CL4EE.Tr("enable-preview") }) == 1;
+            var enable = GUILayout.Toolbar(BlendShapeModifierPreview.PreviewNode.IsEnabled.Value ? 1 : 0, new[] { CL4EE.Tr("disable-preview"), CL4EE.Tr("enable-preview") }) == 1;
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                BlendShapeModifierPreview.PreviewNode.IsEnabled.Value = enable;
+            }
 
             EditorGUILayout.EndHorizontal();
 

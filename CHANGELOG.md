@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Mesh replacement was not being correctly observed in the preview.
 - The preview was refreshing unnecessarily.
 - The preview did not respect meshes from upstream nodes.
+- The preview trace was flooded with PublishedValue traces.
 
 ### Security
 
