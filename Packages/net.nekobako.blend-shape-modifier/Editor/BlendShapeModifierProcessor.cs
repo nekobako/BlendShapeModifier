@@ -43,24 +43,27 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public Vector3 Tangent;
         }
 
-        public static Mesh GenerateMesh(SkinnedMeshRenderer renderer, BlendShapeModifier modifier)
+        public static void Process(SkinnedMeshRenderer renderer, BlendShapeModifier[] modifiers)
         {
-            return GenerateMesh(renderer, renderer, modifier, ComputeContext.NullContext);
+            Process(renderer, renderer, modifiers, ComputeContext.NullContext);
         }
 
-        public static Mesh GenerateMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier modifier, ComputeContext context)
+        public static void Process(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier[] modifiers, ComputeContext context)
         {
             var mesh = Object.Instantiate(proxy.sharedMesh);
+            var shapes = modifiers
+                .SelectMany(x => x.Shapes)
+                .ToArray();
 
-            using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + modifier.Shapes.Count, Allocator.Temp);
+            using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + shapes.Length, Allocator.Temp);
             var blendShapesSpan = blendShapes.AsSpan();
             var blendShapeFrameIndex = 0;
             for (var i = 0; i < blendShapesSpan.Length; i++)
             {
                 ref var blendShape = ref blendShapesSpan[i];
-                blendShape.Name = i < mesh.blendShapeCount ? mesh.GetBlendShapeName(i) : modifier.Shapes[i - mesh.blendShapeCount].Name;
+                blendShape.Name = i < mesh.blendShapeCount ? mesh.GetBlendShapeName(i) : shapes[i - mesh.blendShapeCount].Name;
                 blendShape.FrameIndex = blendShapeFrameIndex;
-                blendShape.FrameCount = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameCount(i) : modifier.Shapes[i - mesh.blendShapeCount].Frames.Count;
+                blendShape.FrameCount = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameCount(i) : shapes[i - mesh.blendShapeCount].Frames.Count;
                 blendShapeFrameIndex += blendShape.FrameCount;
             }
 
@@ -73,7 +76,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 for (var j = 0; j < blendShape.FrameCount; j++)
                 {
                     ref var blendShapeFrame = ref blendShapeFramesSpan[blendShape.FrameIndex + j];
-                    blendShapeFrame.Weight = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameWeight(i, j) : modifier.Shapes[i - mesh.blendShapeCount].Frames[j].Weight;
+                    blendShapeFrame.Weight = i < mesh.blendShapeCount ? mesh.GetBlendShapeFrameWeight(i, j) : shapes[i - mesh.blendShapeCount].Frames[j].Weight;
                     blendShapeFrame.DeltaIndex = blendShapeDeltaIndex;
                     blendShapeFrame.DeltaCount = mesh.vertexCount;
                     blendShapeDeltaIndex += blendShapeFrame.DeltaCount;
@@ -105,7 +108,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     else
                     {
                         BlendShapeExpressionProcessor.Process(
-                            modifier.Shapes[i - mesh.blendShapeCount].Frames[j].Expression,
+                            shapes[i - mesh.blendShapeCount].Frames[j].Expression,
                             new()
                             {
                                 OriginalRenderer = original,
@@ -161,12 +164,14 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
             }
 
-            return mesh;
+            proxy.sharedMesh = mesh;
+
+            ApplyWeights(proxy, modifiers);
         }
 
-        public static void ApplyWeights(SkinnedMeshRenderer renderer, BlendShapeModifier modifier)
+        public static void ApplyWeights(SkinnedMeshRenderer renderer, BlendShapeModifier[] modifiers)
         {
-            foreach (var shape in modifier.Shapes)
+            foreach (var shape in modifiers.SelectMany(x => x.Shapes))
             {
                 var index = renderer.sharedMesh.GetBlendShapeIndex(shape.Name);
                 if (index >= 0 && index < renderer.sharedMesh.blendShapeCount)
