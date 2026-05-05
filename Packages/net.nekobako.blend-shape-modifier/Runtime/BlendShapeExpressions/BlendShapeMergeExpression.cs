@@ -12,6 +12,16 @@ namespace net.nekobako.BlendShapeModifier.Runtime
         [SerializeReference, NotKeyable]
         public List<IBlendShapeExpression> Expressions = new() { new BlendShapeSampleExpression(), new BlendShapeSampleExpression() };
 
+        public IEnumerable<IBlendShapeExpression> Flatten()
+        {
+            yield return this;
+
+            foreach (var expression in Expressions.SelectMany(x => x.Flatten()))
+            {
+                yield return expression;
+            }
+        }
+
         public IBlendShapeExpression Clone()
         {
             return new BlendShapeMergeExpression

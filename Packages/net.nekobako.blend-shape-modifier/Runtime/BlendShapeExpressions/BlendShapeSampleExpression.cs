@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -12,6 +13,11 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
         [SerializeField, NotKeyable]
         public float Weight = 100.0f;
+
+        public IEnumerable<IBlendShapeExpression> Flatten()
+        {
+            yield return this;
+        }
 
         public IBlendShapeExpression Clone()
         {

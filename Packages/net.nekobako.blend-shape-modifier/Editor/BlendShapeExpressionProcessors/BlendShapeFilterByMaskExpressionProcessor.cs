@@ -10,64 +10,78 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
     internal class BlendShapeFilterByMaskExpressionProcessor : BlendShapeExpressionProcessor<BlendShapeFilterByMaskExpression>
     {
+        private int m_Slot = 0;
+        private Texture2D m_Mask = null;
+        private Texture2D m_Temp = null;
+
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeFilterByMaskExpressionProcessor());
+            Register(expression => new BlendShapeFilterByMaskExpressionProcessor(expression));
         }
 
-        private BlendShapeFilterByMaskExpressionProcessor()
+        private BlendShapeFilterByMaskExpressionProcessor(BlendShapeFilterByMaskExpression expression) : base(expression)
         {
         }
 
-        protected override void OnProcess(BlendShapeFilterByMaskExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        protected override void Prepare(BlendShapeModifierProcessor.Context context)
         {
-            Process(expression.Expression, context, results);
+            m_Mask = Expression.Mask;
+            m_Slot = Mathf.Min(Expression.Slot, context.SubMeshCount - 1);
 
-            var mask = expression.Mask;
-            if (!mask)
+            if (!m_Mask)
             {
                 return;
             }
 
-            context.ComputeContext.Observe(mask, x => x.imageContentsHash);
+            context.ComputeContext.Observe(m_Mask, x => x.imageContentsHash);
 
 #if BSM_MASK_TEXTURE_EDITOR
-            var editing = MaskTextureEditor.Editor.Window.ObserveTextureFor(context.ComputeContext, expression.Mask, context.OriginalRenderer, expression.Slot,
+            var editing = MaskTextureEditor.Editor.Window.ObserveTextureFor(context.ComputeContext, m_Mask, context.OriginalRenderer, m_Slot,
                 BlendShapeFilterByMaskExpressionDrawer.MaskTextureEditorToken);
             if (editing)
             {
-                mask = editing;
+                m_Mask = editing;
             }
 #endif
 
-            var temp = default(Texture2D);
-            if (!mask.isReadable)
+            if (m_Mask.isReadable)
             {
-                var rt = RenderTexture.GetTemporary(mask.width, mask.height);
-                Graphics.Blit(mask, rt);
-
-                mask = temp = new(mask.width, mask.height)
-                {
-                    filterMode = mask.filterMode,
-                    wrapModeU = mask.wrapModeU,
-                    wrapModeV = mask.wrapModeV,
-                };
-                mask.ReadPixels(new(0.0f, 0.0f, mask.width, mask.height), 0, 0);
-                mask.Apply();
-
-                RenderTexture.active = null;
-                RenderTexture.ReleaseTemporary(rt);
+                return;
             }
 
-            var slot = Mathf.Min(expression.Slot, context.SubMeshCount - 1);
+            var rt = RenderTexture.GetTemporary(m_Mask.width, m_Mask.height);
+            Graphics.Blit(m_Mask, rt);
+
+            m_Mask = m_Temp = new(m_Mask.width, m_Mask.height)
+            {
+                filterMode = m_Mask.filterMode,
+                wrapModeU = m_Mask.wrapModeU,
+                wrapModeV = m_Mask.wrapModeV,
+            };
+            m_Mask.ReadPixels(new(0.0f, 0.0f, m_Mask.width, m_Mask.height), 0, 0);
+            m_Mask.Apply();
+
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(rt);
+        }
+
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        {
+            context.ExpressionProcessors[Expression.Expression].Process(context, results);
+
+            if (!m_Mask)
+            {
+                return;
+            }
+
             for (var i = 0; i < results.Length; i++)
             {
                 ref var result = ref results[i];
-                if (context.SubMeshMasks.IsSet(context.VertexCount * slot + i))
+                if (context.SubMeshMasks.IsSet(context.VertexCount * m_Slot + i))
                 {
                     var uv = context.VertexUvs[i];
-                    var weight = mask.GetPixel((int)(uv.x * mask.width), (int)(uv.y * mask.height)).r;
+                    var weight = m_Mask.GetPixel((int)(uv.x * m_Mask.width), (int)(uv.y * m_Mask.height)).r;
                     result.Position *= weight;
                     result.Normal *= weight;
                     result.Tangent *= weight;
@@ -79,11 +93,16 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     result.Tangent = Vector3.zero;
                 }
             }
+        }
 
-            if (temp)
+        public override void Dispose()
+        {
+            if (!m_Temp)
             {
-                Object.DestroyImmediate(temp);
+                return;
             }
+
+            Object.DestroyImmediate(m_Temp);
         }
     }
 }

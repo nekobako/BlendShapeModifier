@@ -11,21 +11,25 @@ namespace net.nekobako.BlendShapeModifier.Editor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeMergeExpressionProcessor());
+            Register(expression => new BlendShapeMergeExpressionProcessor(expression));
         }
 
-        private BlendShapeMergeExpressionProcessor()
+        private BlendShapeMergeExpressionProcessor(BlendShapeMergeExpression expression) : base(expression)
         {
         }
 
-        protected override void OnProcess(BlendShapeMergeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        protected override void Prepare(BlendShapeModifierProcessor.Context context)
+        {
+        }
+
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
         {
             using var blendShapeDeltas = new NativeArray<BlendShapeModifierProcessor.BlendShapeDelta>(results.Length, Allocator.Temp);
             var blendShapeDeltasSpan = blendShapeDeltas.AsSpan();
 
-            foreach (var target in expression.Expressions)
+            foreach (var expression in Expression.Expressions)
             {
-                Process(target, context, blendShapeDeltasSpan);
+                context.ExpressionProcessors[expression].Process(context, blendShapeDeltasSpan);
 
                 for (var i = 0; i < results.Length; i++)
                 {
@@ -38,6 +42,10 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
                 blendShapeDeltasSpan.Clear();
             }
+        }
+
+        public override void Dispose()
+        {
         }
     }
 }

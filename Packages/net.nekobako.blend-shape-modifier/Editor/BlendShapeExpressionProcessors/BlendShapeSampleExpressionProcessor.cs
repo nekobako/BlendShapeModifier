@@ -11,19 +11,23 @@ namespace net.nekobako.BlendShapeModifier.Editor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeSampleExpressionProcessor());
+            Register(expression => new BlendShapeSampleExpressionProcessor(expression));
         }
 
-        private BlendShapeSampleExpressionProcessor()
+        private BlendShapeSampleExpressionProcessor(BlendShapeSampleExpression expression) : base(expression)
         {
         }
 
-        protected override void OnProcess(BlendShapeSampleExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        protected override void Prepare(BlendShapeModifierProcessor.Context context)
+        {
+        }
+
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
         {
             for (var i = context.BlendShapes.Length - 1; i >= 0; i--)
             {
                 var blendShape = context.BlendShapes[i];
-                if (blendShape.Name.Value != expression.Name)
+                if (blendShape.Name.Value != Expression.Name)
                 {
                     continue;
                 }
@@ -34,31 +38,31 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
 
                 var minFrame = context.BlendShapeFrames[blendShape.FrameIndex + 0];
-                if (expression.Weight <= minFrame.Weight)
+                if (Expression.Weight <= minFrame.Weight)
                 {
                     if (blendShape.FrameCount == 1 || minFrame.Weight > 0.0f)
                     {
-                        LerpOneFrame(minFrame, expression.Weight, context, results);
+                        LerpOneFrame(minFrame, Expression.Weight, context, results);
                     }
                     else
                     {
                         var nextMinFrame = context.BlendShapeFrames[blendShape.FrameIndex + 1];
-                        LerpTwoFrame(minFrame, nextMinFrame, expression.Weight, context, results);
+                        LerpTwoFrame(minFrame, nextMinFrame, Expression.Weight, context, results);
                     }
                     return;
                 }
 
                 var maxFrame = context.BlendShapeFrames[blendShape.FrameIndex + blendShape.FrameCount - 1];
-                if (expression.Weight >= maxFrame.Weight)
+                if (Expression.Weight >= maxFrame.Weight)
                 {
                     if (blendShape.FrameCount == 1 || maxFrame.Weight < 0.0f)
                     {
-                        LerpOneFrame(maxFrame, expression.Weight, context, results);
+                        LerpOneFrame(maxFrame, Expression.Weight, context, results);
                     }
                     else
                     {
                         var prevMaxFrame = context.BlendShapeFrames[blendShape.FrameIndex + blendShape.FrameCount - 2];
-                        LerpTwoFrame(prevMaxFrame, maxFrame, expression.Weight, context, results);
+                        LerpTwoFrame(prevMaxFrame, maxFrame, Expression.Weight, context, results);
                     }
                     return;
                 }
@@ -67,13 +71,17 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 {
                     var prevMaxFrame = context.BlendShapeFrames[blendShape.FrameIndex + j + 0];
                     var nextMaxFrame = context.BlendShapeFrames[blendShape.FrameIndex + j + 1];
-                    if (expression.Weight >= prevMaxFrame.Weight && expression.Weight <= nextMaxFrame.Weight)
+                    if (Expression.Weight >= prevMaxFrame.Weight && Expression.Weight <= nextMaxFrame.Weight)
                     {
-                        LerpTwoFrame(prevMaxFrame, nextMaxFrame, expression.Weight, context, results);
+                        LerpTwoFrame(prevMaxFrame, nextMaxFrame, Expression.Weight, context, results);
                         return;
                     }
                 }
             }
+        }
+
+        public override void Dispose()
+        {
         }
 
         private void LerpOneFrame(

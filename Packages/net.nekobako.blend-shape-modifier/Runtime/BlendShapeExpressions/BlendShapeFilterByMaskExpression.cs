@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -15,6 +16,16 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
         [SerializeReference, NotKeyable]
         public IBlendShapeExpression Expression = new BlendShapeSampleExpression();
+
+        public IEnumerable<IBlendShapeExpression> Flatten()
+        {
+            yield return this;
+
+            foreach (var expression in Expression.Flatten())
+            {
+                yield return expression;
+            }
+        }
 
         public IBlendShapeExpression Clone()
         {

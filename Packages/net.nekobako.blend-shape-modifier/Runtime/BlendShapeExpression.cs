@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace net.nekobako.BlendShapeModifier.Runtime
@@ -26,6 +27,7 @@ namespace net.nekobako.BlendShapeModifier.Runtime
 
     internal interface IBlendShapeExpression : IEquatable<IBlendShapeExpression>
     {
+        IEnumerable<IBlendShapeExpression> Flatten();
         IBlendShapeExpression Clone();
     }
 }

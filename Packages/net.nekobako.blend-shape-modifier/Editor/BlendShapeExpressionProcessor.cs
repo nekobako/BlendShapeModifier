@@ -5,35 +5,39 @@ namespace net.nekobako.BlendShapeModifier.Editor
 {
     using Runtime;
 
-    internal abstract class BlendShapeExpressionProcessor
+    internal abstract class BlendShapeExpressionProcessor : IDisposable
     {
-        private static readonly Dictionary<Type, BlendShapeExpressionProcessor> s_Instances = new();
+        private static readonly Dictionary<Type, Func<IBlendShapeExpression, BlendShapeExpressionProcessor>> s_Creators = new();
 
-        protected static void Register<T>(BlendShapeExpressionProcessor instance) where T : IBlendShapeExpression
+        protected static void Register<T>(Func<T, BlendShapeExpressionProcessor> creator) where T : IBlendShapeExpression
         {
-            s_Instances[typeof(T)] = instance;
+            s_Creators[typeof(T)] = expression => creator((T)expression);
         }
 
-        public static void Process(IBlendShapeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        public static BlendShapeExpressionProcessor Create(IBlendShapeExpression expression, BlendShapeModifierProcessor.Context context)
         {
-            s_Instances[expression.GetType()].OnProcess(expression, context, results);
+            var instance = s_Creators[expression.GetType()].Invoke(expression);
+            instance.Prepare(context);
+            return instance;
         }
 
-        protected abstract void OnProcess(IBlendShapeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results);
+        protected abstract void Prepare(BlendShapeModifierProcessor.Context context);
+        public abstract void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results);
+        public abstract void Dispose();
     }
 
     internal abstract class BlendShapeExpressionProcessor<T> : BlendShapeExpressionProcessor where T : IBlendShapeExpression
     {
-        protected static void Register(BlendShapeExpressionProcessor<T> instance)
+        protected readonly T Expression = default;
+
+        protected static void Register(Func<T, BlendShapeExpressionProcessor<T>> creator)
         {
-            Register<T>(instance);
+            Register<T>(creator);
         }
 
-        protected sealed override void OnProcess(IBlendShapeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        protected BlendShapeExpressionProcessor(T expression)
         {
-            OnProcess((T)expression, context, results);
+            Expression = expression;
         }
-
-        protected abstract void OnProcess(T expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results);
     }
 }

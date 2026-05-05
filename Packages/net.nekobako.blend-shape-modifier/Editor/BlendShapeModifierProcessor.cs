@@ -25,6 +25,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public ReadOnlySpan<BlendShape> BlendShapes { get; init; }
             public ReadOnlySpan<BlendShapeFrame> BlendShapeFrames { get; init; }
             public ReadOnlySpan<BlendShapeDelta> BlendShapeDeltas { get; init; }
+            public Dictionary<IBlendShapeExpression, BlendShapeExpressionProcessor> ExpressionProcessors { get; init; }
         }
 
         public struct BlendShape
@@ -81,6 +82,21 @@ namespace net.nekobako.BlendShapeModifier.Editor
             var shapes = modifiers
                 .SelectMany(x => x.Shapes)
                 .ToArray();
+            var processors = shapes
+                .SelectMany(x => x.Frames)
+                .SelectMany(x => x.Expression.Flatten())
+                .Distinct()
+                .ToDictionary(x => x, x => BlendShapeExpressionProcessor.Create(x, new()
+                {
+                    OriginalRenderer = original,
+                    ProxyRenderer = proxy,
+                    ComputeContext = context,
+                    VertexCount = vertexCount,
+                    SubMeshCount = subMeshCount,
+                    VertexPositions = readonlyVertexPositions,
+                    VertexUvs = readonlyVertexUvs,
+                    SubMeshMasks = readonlySubMeshMasks,
+                }));
 
             using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + shapes.Length, Allocator.Temp);
             var blendShapesSpan = blendShapes.AsSpan();
@@ -134,7 +150,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     }
                     else
                     {
-                        BlendShapeExpressionProcessor.Process(shapes[i - mesh.blendShapeCount].Frames[j].Expression, new()
+                        processors[shapes[i - mesh.blendShapeCount].Frames[j].Expression].Process(new()
                         {
                             OriginalRenderer = original,
                             ProxyRenderer = proxy,
@@ -147,9 +163,15 @@ namespace net.nekobako.BlendShapeModifier.Editor
                             BlendShapes = blendShapesSpan[..i],
                             BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
                             BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
+                            ExpressionProcessors = processors,
                         }, blendShapeDeltasSpan[blendShapeFrame.DeltaIndex..(blendShapeFrame.DeltaIndex + blendShapeFrame.DeltaCount)]);
                     }
                 }
+            }
+
+            foreach (var processor in processors.Values)
+            {
+                processor.Dispose();
             }
 
             var blendShapeNames = new List<string>();

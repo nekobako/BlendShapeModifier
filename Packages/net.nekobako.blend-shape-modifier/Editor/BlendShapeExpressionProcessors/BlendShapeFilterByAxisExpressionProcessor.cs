@@ -11,26 +11,34 @@ namespace net.nekobako.BlendShapeModifier.Editor
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeFilterByAxisExpressionProcessor());
+            Register(expression => new BlendShapeFilterByAxisExpressionProcessor(expression));
         }
 
-        private BlendShapeFilterByAxisExpressionProcessor()
+        private BlendShapeFilterByAxisExpressionProcessor(BlendShapeFilterByAxisExpression expression) : base(expression)
         {
         }
 
-        protected override void OnProcess(BlendShapeFilterByAxisExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        protected override void Prepare(BlendShapeModifierProcessor.Context context)
         {
-            Process(expression.Expression, context, results);
+        }
+
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        {
+            context.ExpressionProcessors[Expression.Expression].Process(context, results);
 
             for (var i = 0; i < results.Length; i++)
             {
                 ref var result = ref results[i];
-                var distance = Vector3.Dot(context.VertexPositions[i] - expression.Position, expression.Direction.normalized);
-                var weight = InverseLerp(-expression.FalloffRange * 0.5f, expression.FalloffRange * 0.5f, distance);
+                var distance = Vector3.Dot(context.VertexPositions[i] - Expression.Position, Expression.Direction.normalized);
+                var weight = InverseLerp(-Expression.FalloffRange * 0.5f, Expression.FalloffRange * 0.5f, distance);
                 result.Position *= weight;
                 result.Normal *= weight;
                 result.Tangent *= weight;
             }
+        }
+
+        public override void Dispose()
+        {
         }
 
         private float InverseLerp(float a, float b, float value)
