@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using nadena.dev.ndmf.preview;
@@ -61,15 +60,24 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 RenderTexture.ReleaseTemporary(rt);
             }
 
-            var uv = context.ProxyRenderer.sharedMesh.uv;
-            var indices = context.ProxyRenderer.sharedMesh.GetIndices(Mathf.Min(expression.Slot, context.ProxyRenderer.sharedMesh.subMeshCount - 1)).ToHashSet();
+            var slot = Mathf.Min(expression.Slot, context.SubMeshCount - 1);
             for (var i = 0; i < results.Length; i++)
             {
                 ref var result = ref results[i];
-                var weight = indices.Contains(i) ? mask.GetPixel((int)(uv[i].x * mask.width), (int)(uv[i].y * mask.height)).r : 0.0f;
-                result.Position *= weight;
-                result.Normal *= weight;
-                result.Tangent *= weight;
+                if (context.SubMeshMasks.IsSet(context.VertexCount * slot + i))
+                {
+                    var uv = context.VertexUvs[i];
+                    var weight = mask.GetPixel((int)(uv.x * mask.width), (int)(uv.y * mask.height)).r;
+                    result.Position *= weight;
+                    result.Normal *= weight;
+                    result.Tangent *= weight;
+                }
+                else
+                {
+                    result.Position = Vector3.zero;
+                    result.Normal = Vector3.zero;
+                    result.Tangent = Vector3.zero;
+                }
             }
 
             if (temp)

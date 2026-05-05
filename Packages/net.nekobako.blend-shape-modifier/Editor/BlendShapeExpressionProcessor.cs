@@ -16,7 +16,6 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         public static void Process(IBlendShapeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
         {
-            results.Clear();
             s_Instances[expression.GetType()].OnProcess(expression, context, results);
         }
 
