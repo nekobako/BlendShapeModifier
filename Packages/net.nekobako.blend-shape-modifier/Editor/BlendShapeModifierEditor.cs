@@ -141,7 +141,15 @@ namespace net.nekobako.BlendShapeModifier.Editor
                 }
             }
 
-            dropdown.AddItem(CL4EE.Tr("new-shape-name"), () => AddShape(null, CL4EE.Tr("new-shape-name")));
+            var existingShapeNames = new string[m_ShapesProperty.arraySize];
+            for (var i = 0; i < m_ShapesProperty.arraySize; i++)
+            {
+                var shapeProperty = m_ShapesProperty.GetArrayElementAtIndex(i);
+                var shapeNameProperty = shapeProperty.FindPropertyRelative(nameof(BlendShape.Name));
+                existingShapeNames[i] =  shapeNameProperty.stringValue;
+            }
+            var newShapeName = ObjectNames.GetUniqueName(existingShapeNames, CL4EE.Tr("new-shape-name"));
+            dropdown.AddItem(newShapeName, () => AddShape(null, newShapeName));
 
             dropdown.Show(rect);
 

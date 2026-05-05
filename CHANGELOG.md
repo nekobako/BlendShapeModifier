@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - Allow multiple components for the same renderer.
+- Suggest unique name for new shape.
 
 ### Deprecated
 
