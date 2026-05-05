@@ -47,7 +47,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             private ComputeContext m_MeshContext = null;
             private ComputeContext m_ShapesContext = null;
 
-            public RenderAspects WhatChanged { get; private set; }
+            public RenderAspects WhatChanged { get; private set; } = RenderAspects.Mesh;
 
             public Node(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier[] modifiers, ComputeContext context)
             {
@@ -62,7 +62,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
             {
                 if (aspects.HasFlag(RenderAspects.Mesh) || m_MeshContext.IsInvalidated)
                 {
-                    return Task.FromResult<IRenderFilterNode>(null);
+                    // Returning null here forcibly passes RenderAspects.Everything to Refresh() of downstream nodes
+                    // return Task.FromResult<IRenderFilterNode>(null);
+                    var (original, proxy) = pairs.Single();
+                    var node = new Node(original as SkinnedMeshRenderer, proxy as SkinnedMeshRenderer, m_Modifiers, context);
+                    return Task.FromResult<IRenderFilterNode>(node);
                 }
 
                 WhatChanged = m_ShapesContext.IsInvalidated ? RenderAspects.Shapes : 0;
