@@ -14,12 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Removed
 
 ### Fixed
+- BlendShapeFilterByMaskExpression was not correctly handling meshes with multiple submeshes.
 
 ### Security
 
 ## [1.1.0] - 2025-10-11
 ### Changed
-- Improve Blend Shape Filter By Axis Expression editor.
+- Improve BlendShapeFilterByAxisExpression editor.
 
 ### Fixed
 - Components with invalid configurations were not destroyed.

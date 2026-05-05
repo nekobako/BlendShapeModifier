@@ -62,10 +62,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
             }
 
             var uv = context.Modifier.Renderer.sharedMesh.uv;
-            foreach (var index in context.Modifier.Renderer.sharedMesh.GetIndices(Mathf.Min(expression.Slot, context.Modifier.Renderer.sharedMesh.subMeshCount - 1)).Distinct())
+            var indices = context.Modifier.Renderer.sharedMesh.GetIndices(Mathf.Min(expression.Slot, context.Modifier.Renderer.sharedMesh.subMeshCount - 1)).ToHashSet();
+            for (var i = 0; i < results.Length; i++)
             {
-                ref var result = ref results[index];
-                var weight = mask.GetPixel((int)(uv[index].x * mask.width), (int)(uv[index].y * mask.height)).r;
+                ref var result = ref results[i];
+                var weight = indices.Contains(i) ? mask.GetPixel((int)(uv[i].x * mask.width), (int)(uv[i].y * mask.height)).r : 0.0f;
                 result.Position *= weight;
                 result.Normal *= weight;
                 result.Tangent *= weight;
