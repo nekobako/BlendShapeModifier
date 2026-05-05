@@ -8,13 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 ### Changed
-- Allow multiple components for the same renderer.
-- Suggest unique name for new shape.
-- Improve performance.
 
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+### Security
+
+## [1.2.0] - 2026-05-06
+### Changed
+- Allow multiple components for the same renderer.
+- Suggest unique name for new shape.
+- Improve performance.
 
 ### Fixed
 - BlendShapeFilterByMaskExpression was not correctly handling meshes with multiple submeshes.
@@ -22,8 +29,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - The preview was refreshing unnecessarily.
 - The preview did not respect meshes from upstream nodes.
 - The preview trace was flooded with PublishedValue traces.
-
-### Security
 
 ## [1.1.0] - 2025-10-11
 ### Changed
