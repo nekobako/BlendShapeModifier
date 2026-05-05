@@ -17,6 +17,11 @@ namespace net.nekobako.BlendShapeModifier.Editor
             public SkinnedMeshRenderer OriginalRenderer { get; init; }
             public SkinnedMeshRenderer ProxyRenderer { get; init; }
             public ComputeContext ComputeContext { get; init; }
+            public int VertexCount { get; init; }
+            public int SubMeshCount { get; init; }
+            public NativeArray<Vector3>.ReadOnly VertexPositions { get; init; }
+            public NativeArray<Vector2>.ReadOnly VertexUvs { get; init; }
+            public NativeBitArray.ReadOnly SubMeshMasks { get; init; }
             public ReadOnlySpan<BlendShape> BlendShapes { get; init; }
             public ReadOnlySpan<BlendShapeFrame> BlendShapeFrames { get; init; }
             public ReadOnlySpan<BlendShapeDelta> BlendShapeDeltas { get; init; }
@@ -51,11 +56,53 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
         public static void ProcessMesh(SkinnedMeshRenderer original, SkinnedMeshRenderer proxy, BlendShapeModifier[] modifiers, ComputeContext context)
         {
+            var baked = new Mesh();
+            original.BakeMesh(baked, true);
+            context.ObserveTransformPosition(original.transform);
+
+            var vertexCount = baked.vertexCount;
+            var subMeshCount = baked.subMeshCount;
+            using var vertexPositions = new NativeArray<Vector3>(baked.vertices, Allocator.Temp);
+            using var vertexUvs = new NativeArray<Vector2>(baked.uv, Allocator.Temp);
+            using var subMeshMasks = new NativeBitArray(vertexCount * subMeshCount, Allocator.Temp);
+            var readonlyVertexPositions = vertexPositions.AsReadOnly();
+            var readonlyVertexUvs = vertexUvs.AsReadOnly();
+            var readonlySubMeshMasks = subMeshMasks.AsReadOnly();
+            for (var i = 0; i < subMeshCount; i++)
+            {
+                foreach (var index in baked.GetIndices(i))
+                {
+                    subMeshMasks.Set(vertexCount * i + index, true);
+                }
+            }
+
+            Object.DestroyImmediate(baked);
+
             var shapes = modifiers
                 .SelectMany(x => context.Observe(x, y => y.Shapes.Select(z => z.Clone(0.0f)).ToArray(), Enumerable.SequenceEqual))
                 .ToArray();
 
             var mesh = Object.Instantiate(proxy.sharedMesh);
+
+            var processors = shapes
+                .Select(x => x.Frames
+                    .Select(y => BlendShapeExpressionProcessor.Create(y.Expression))
+                    .ToArray())
+                .ToArray();
+            foreach (var processor in processors.SelectMany(x => x))
+            {
+                processor.Prepare(new()
+                {
+                    OriginalRenderer = original,
+                    ProxyRenderer = proxy,
+                    ComputeContext = context,
+                    VertexCount = vertexCount,
+                    SubMeshCount = subMeshCount,
+                    VertexPositions = readonlyVertexPositions,
+                    VertexUvs = readonlyVertexUvs,
+                    SubMeshMasks = readonlySubMeshMasks,
+                });
+            }
 
             using var blendShapes = new NativeArray<BlendShape>(mesh.blendShapeCount + shapes.Length, Allocator.Temp);
             var blendShapesSpan = blendShapes.AsSpan();
@@ -109,20 +156,27 @@ namespace net.nekobako.BlendShapeModifier.Editor
                     }
                     else
                     {
-                        BlendShapeExpressionProcessor.Process(
-                            shapes[i - mesh.blendShapeCount].Frames[j].Expression,
-                            new()
-                            {
-                                OriginalRenderer = original,
-                                ProxyRenderer = proxy,
-                                ComputeContext = context,
-                                BlendShapes = blendShapesSpan[..i],
-                                BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
-                                BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
-                            },
-                            blendShapeDeltasSpan[blendShapeFrame.DeltaIndex..(blendShapeFrame.DeltaIndex + blendShapeFrame.DeltaCount)]);
+                        processors[i - mesh.blendShapeCount][j].Process(new()
+                        {
+                            OriginalRenderer = original,
+                            ProxyRenderer = proxy,
+                            ComputeContext = context,
+                            VertexCount = vertexCount,
+                            SubMeshCount = subMeshCount,
+                            VertexPositions = readonlyVertexPositions,
+                            VertexUvs = readonlyVertexUvs,
+                            SubMeshMasks = readonlySubMeshMasks,
+                            BlendShapes = blendShapesSpan[..i],
+                            BlendShapeFrames = blendShapeFramesSpan[..blendShapesSpan[i].FrameIndex],
+                            BlendShapeDeltas = blendShapeDeltasSpan[..blendShapeFramesSpan[blendShapesSpan[i].FrameIndex].DeltaIndex],
+                        }, blendShapeDeltasSpan[blendShapeFrame.DeltaIndex..(blendShapeFrame.DeltaIndex + blendShapeFrame.DeltaCount)]);
                     }
                 }
+            }
+
+            foreach (var processor in processors.SelectMany(x => x))
+            {
+                processor.Dispose();
             }
 
             var blendShapeNames = new List<string>();

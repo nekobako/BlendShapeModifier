@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Unity.Collections;
 using UnityEditor;
 
@@ -8,31 +9,56 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
     internal class BlendShapeMergeExpressionProcessor : BlendShapeExpressionProcessor<BlendShapeMergeExpression>
     {
+        private readonly BlendShapeExpressionProcessor[] m_Processors = null;
+
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeMergeExpressionProcessor());
+            Register(expression => new BlendShapeMergeExpressionProcessor(expression));
         }
 
-        private BlendShapeMergeExpressionProcessor()
+        private BlendShapeMergeExpressionProcessor(BlendShapeMergeExpression expression) : base(expression)
         {
+            m_Processors = expression.Expressions
+                .Select(Create)
+                .ToArray();
         }
 
-        protected override void OnProcess(BlendShapeMergeExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        public override void Prepare(BlendShapeModifierProcessor.Context context)
+        {
+            foreach (var processor in m_Processors)
+            {
+                processor.Prepare(context);
+            }
+        }
+
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
         {
             using var blendShapeDeltas = new NativeArray<BlendShapeModifierProcessor.BlendShapeDelta>(results.Length, Allocator.Temp);
+            var blendShapeDeltasSpan = blendShapeDeltas.AsSpan();
 
-            foreach (var target in expression.Expressions)
+            foreach (var processor in m_Processors)
             {
-                Process(target, context, blendShapeDeltas);
+                processor.Process(context, blendShapeDeltasSpan);
 
                 for (var i = 0; i < results.Length; i++)
                 {
                     ref var result = ref results[i];
-                    result.Position += blendShapeDeltas[i].Position;
-                    result.Normal += blendShapeDeltas[i].Normal;
-                    result.Tangent += blendShapeDeltas[i].Tangent;
+                    ref var delta = ref blendShapeDeltasSpan[i];
+                    result.Position += delta.Position;
+                    result.Normal += delta.Normal;
+                    result.Tangent += delta.Tangent;
                 }
+
+                blendShapeDeltasSpan.Clear();
+            }
+        }
+
+        public override void Dispose()
+        {
+            foreach (var processor in m_Processors)
+            {
+                processor.Dispose();
             }
         }
     }

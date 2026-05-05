@@ -1,8 +1,6 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using nadena.dev.ndmf.preview;
-using Object = UnityEngine.Object;
 
 namespace net.nekobako.BlendShapeModifier.Editor
 {
@@ -10,35 +8,42 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
     internal class BlendShapeFilterByAxisExpressionProcessor : BlendShapeExpressionProcessor<BlendShapeFilterByAxisExpression>
     {
+        private readonly BlendShapeExpressionProcessor m_Processor = null;
+
         [InitializeOnLoadMethod]
         private static void Initialize()
         {
-            Register(new BlendShapeFilterByAxisExpressionProcessor());
+            Register(expression => new BlendShapeFilterByAxisExpressionProcessor(expression));
         }
 
-        private BlendShapeFilterByAxisExpressionProcessor()
+        private BlendShapeFilterByAxisExpressionProcessor(BlendShapeFilterByAxisExpression expression) : base(expression)
         {
+            m_Processor = Create(expression.Expression);
         }
 
-        protected override void OnProcess(BlendShapeFilterByAxisExpression expression, BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        public override void Prepare(BlendShapeModifierProcessor.Context context)
         {
-            Process(expression.Expression, context, results);
+            m_Processor.Prepare(context);
+        }
 
-            var mesh = new Mesh();
-            context.OriginalRenderer.BakeMesh(mesh, true);
-            context.ComputeContext.ObserveTransformPosition(context.OriginalRenderer.transform);
+        public override void Process(BlendShapeModifierProcessor.Context context, Span<BlendShapeModifierProcessor.BlendShapeDelta> results)
+        {
+            m_Processor.Process(context, results);
 
-            var vertices = mesh.vertices;
             for (var i = 0; i < results.Length; i++)
             {
                 ref var result = ref results[i];
-                var weight = InverseLerp(-expression.FalloffRange * 0.5f, expression.FalloffRange * 0.5f, Vector3.Dot(vertices[i] - expression.Position, expression.Direction.normalized));
+                var distance = Vector3.Dot(context.VertexPositions[i] - Expression.Position, Expression.Direction.normalized);
+                var weight = InverseLerp(-Expression.FalloffRange * 0.5f, Expression.FalloffRange * 0.5f, distance);
                 result.Position *= weight;
                 result.Normal *= weight;
                 result.Tangent *= weight;
             }
+        }
 
-            Object.DestroyImmediate(mesh);
+        public override void Dispose()
+        {
+            m_Processor.Dispose();
         }
 
         private float InverseLerp(float a, float b, float value)
