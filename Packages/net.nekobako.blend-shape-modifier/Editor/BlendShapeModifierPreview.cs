@@ -28,7 +28,7 @@ namespace net.nekobako.BlendShapeModifier.Editor
             return context.GetComponentsByType<BlendShapeModifier>()
                 .Where(x => context.Observe(x, y => y.Renderer) && context.Observe(x.Renderer, y => y.sharedMesh))
                 .GroupBy(x => x.Renderer)
-                .Select(x => RenderGroup.For(x.Key).WithData(x.ToArray()))
+                .Select(x => RenderGroup.For(x.Key).WithData(x.ToArray(), Enumerable.SequenceEqual))
                 .ToImmutableList();
         }
 
