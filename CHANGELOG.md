@@ -14,9 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Removed
 
 ### Fixed
-- Suppress warnings with the latest version of NDMF.
 
 ### Security
+
+## [1.2.1] - 2026-05-16
+### Fixed
+- Suppress warnings with the latest version of NDMF.
 
 ## [1.2.0] - 2026-05-10
 ### Changed
