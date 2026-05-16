@@ -44,10 +44,10 @@ namespace net.nekobako.BlendShapeModifier.Editor
             private const string k_MeshContextDescription = "BlendShapeModifierPreview.Node.MeshContext";
             private const string k_ShapesContextDescription = "BlendShapeModifierPreview.Node.ShapesContext";
 
-            private readonly BlendShapeModifier[] m_Modifiers = null;
-            private readonly Mesh m_Mesh = null;
             private readonly ComputeContext m_MeshContext = null;
             private ComputeContext m_ShapesContext = null;
+            private readonly BlendShapeModifier[] m_Modifiers = null;
+            private readonly Mesh m_Mesh = null;
 
             public RenderAspects WhatChanged { get; private set; } = RenderAspects.Mesh | RenderAspects.Shapes;
 
@@ -71,7 +71,8 @@ namespace net.nekobako.BlendShapeModifier.Editor
 
             public Task<IRenderFilterNode> Refresh(IEnumerable<(Renderer, Renderer)> pairs, ComputeContext context, RenderAspects aspects)
             {
-                if (aspects.HasFlag(RenderAspects.Mesh) || m_MeshContext.IsInvalidated)
+                if (m_MeshContext.IsInvalidated ||
+                    aspects.HasFlag(RenderAspects.Mesh))
                 {
                     // Returning null here forcibly passes RenderAspects.Everything to Refresh() of downstream nodes
                     // return Task.FromResult<IRenderFilterNode>(null);
