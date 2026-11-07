@@ -19,4 +19,4 @@ VRChat アバターのための非破壊ブレンドシェイプ追加/編集ツ
 3. 対象のレンダラーを設定します。
 4. ブレンドシェイプの定義を追加、設定します。
 
-詳しくは [ドキュメント](https://blend-shape-modifier.nekobako.net) を参照してください。
+詳しくは [ドキュメント](https://blend-shape-modifier.nekobako.net/ja-jp/) を参照してください。
